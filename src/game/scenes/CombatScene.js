@@ -1,7 +1,9 @@
 import Phaser from 'phaser'
-import PlayerBenchSystem from '../systems/EnemyBenchSystem'
-import EnemyBenchSystem from '../systems/PlayerBenchSystem'
+
 import ArenaSystem from '../systems/ArenaSystem'
+import PlayerBenchSystem from '../systems/PlayerBenchSystem'
+import EnemyBenchSystem from '../systems/EnemyBenchSystem'
+import TurnSystem from '../systems/TurnSystem'
 
 import { playerParty } from '../state/playerParty'
 import { enemyParty } from '../state/enemyParty'
@@ -24,7 +26,16 @@ export default class CombatScene extends Phaser.Scene {
         this.arena = new ArenaSystem(this)
         this.arena.create()
 
+        this.playerBench = new PlayerBenchSystem(this)
+        this.enemyBench = new EnemyBenchSystem(this)
+
         this.playerBench.create(playerParty)
         this.enemyBench.create(enemyParty)
+
+        this.turnSystem = new TurnSystem(this)
+
+        this.turnSystem.setEnemyUnits(
+            this.enemyBench.getActiveUnits()
+        )
     }
 }

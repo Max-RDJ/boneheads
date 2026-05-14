@@ -46,6 +46,7 @@ export default class EnemyBenchSystem extends BenchBase {
                 data.textures.idleKey
             )
 
+            sprite.unit = unit
             sprite.setDisplaySize(64, 64)
 
             this.scene.tweens.add({
@@ -61,5 +62,9 @@ export default class EnemyBenchSystem extends BenchBase {
 
             this.startBlinking(sprite, data)
         })
+    }
+
+    getActiveUnits() {
+        return this.sprites.filter(s => !s.isDead)
     }
 }
