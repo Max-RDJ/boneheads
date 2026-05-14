@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
-import PlayerBenchSystem from '../systems/PlayerBenchSystem'
-import EnemyBenchSystem from '../systems/EnemyBenchSystem'
+import PlayerBenchSystem from '../systems/EnemyBenchSystem'
+import EnemyBenchSystem from '../systems/PlayerBenchSystem'
 import ArenaSystem from '../systems/ArenaSystem'
 
 import { playerParty } from '../state/playerParty'
