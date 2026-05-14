@@ -1,6 +1,11 @@
 import Phaser from 'phaser'
+import { BONEHEAD_DB } from '../data/boneheadDB'
 
+const GAME_WIDTH = 800;
+
+const SLOT_SPACING = 100;
 const PLAYER_BENCH_Y = 500;
+
 const PLAYER_BATTLE_X = 400;
 const PLAYER_BATTLE_Y = 350;
 
@@ -12,50 +17,49 @@ const BATTLE_ZONE = {
 };
 
 export default class BenchSystem {
-
     constructor(scene) {
-        this.scene = scene
-        this.playerBench = []
-        this.opponentBench = []
-        this.activePlayerBonehead = null
+        this.scene = scene;
+
+        this.playerBench = [];
+        this.activePlayerBonehead = null;
     }
 
-    preload(boneheads) {
+    preload(playerParty) {
+        playerParty.forEach(unit => {
+            const data = BONEHEAD_DB[unit.typeId];
+            if (!data) return;
 
-        boneheads.forEach(b => {
-
-            this.scene.load.image(
-                b.textures.idleKey,
-                b.textures.idleUrl
-            )
-
-            this.scene.load.image(
-                b.textures.blinkKey,
-                b.textures.blinkUrl
-            )
-        })
+            this.scene.load.image(data.textures.idleKey, data.textures.idleUrl);
+            this.scene.load.image(data.textures.blinkKey, data.textures.blinkUrl);
+        });
     }
 
-    create(boneheads) {
+    create(playerParty) {
+        const count = playerParty.length;
+        const totalWidth = (count - 1) * SLOT_SPACING;
+        const startX = (GAME_WIDTH - totalWidth) / 2;
 
-        boneheads.forEach((b, i) => {
+        playerParty.forEach((unit, i) => {
+            const data = BONEHEAD_DB[unit.typeId];
+            if (!data) return;
 
-            const x = 200 + i * 120
+            const x = startX + i * SLOT_SPACING;
 
             const sprite = this.scene.add.image(
                 x,
                 PLAYER_BENCH_Y,
-                b.textures.idleKey
-            )
+                data.textures.idleKey
+            );
 
-            sprite.setDisplaySize(64, 64)
+            sprite.setDisplaySize(64, 64);
 
-            sprite.benchX = x
-            sprite.benchY = PLAYER_BENCH_Y
+            sprite.benchX = x;
+            sprite.benchY = PLAYER_BENCH_Y;
 
-            sprite.boneheadData = b
+            sprite.unitData = unit;
+            sprite.boneheadData = data;
 
-            sprite.setInteractive({ cursor: 'pointer' })
+            sprite.setInteractive({ cursor: 'pointer' });
             this.scene.input.setDraggable(sprite);
 
             sprite.on('drag', (pointer, dragX, dragY) => {
@@ -64,26 +68,23 @@ export default class BenchSystem {
             });
 
             sprite.on('dragend', () => {
-                const insideBattleZone =
+                const inside =
                     sprite.x > BATTLE_ZONE.x - BATTLE_ZONE.width / 2 &&
                     sprite.x < BATTLE_ZONE.x + BATTLE_ZONE.width / 2 &&
                     sprite.y > BATTLE_ZONE.y - BATTLE_ZONE.height / 2 &&
                     sprite.y < BATTLE_ZONE.y + BATTLE_ZONE.height / 2;
 
-                if (insideBattleZone) {
-
+                if (inside) {
                     this.moveToBattleZone(sprite);
-
                 } else {
-
                     this.returnToBench(sprite);
                 }
             });
 
-            this.playerBench.push(sprite)
+            this.playerBench.push(sprite);
 
-            this.startBlinking(sprite, b)
-        })
+            this.startBlinking(sprite, data);
+        });
     }
 
     moveToBattleZone(sprite) {
@@ -98,7 +99,7 @@ export default class BenchSystem {
             targets: sprite,
             x: PLAYER_BATTLE_X,
             y: PLAYER_BATTLE_Y,
-            duration: 300,
+            duration: 250,
             ease: 'Power2'
         });
 
@@ -110,32 +111,29 @@ export default class BenchSystem {
             targets: sprite,
             x: sprite.benchX,
             y: sprite.benchY,
-            duration: 300,
+            duration: 250,
             ease: 'Power2'
         });
+
+        if (this.activePlayerBonehead === sprite) {
+            this.activePlayerBonehead = null;
+        }
     }
 
-    startBlinking(sprite, bonehead) {
-
+    startBlinking(sprite, data) {
         const blink = () => {
-
-            sprite.setTexture(
-                bonehead.textures.blinkKey
-            )
+            sprite.setTexture(data.textures.blinkKey);
 
             this.scene.time.delayedCall(120, () => {
-
-                sprite.setTexture(
-                    bonehead.textures.idleKey
-                )
-            })
+                sprite.setTexture(data.textures.idleKey);
+            });
 
             this.scene.time.delayedCall(
                 Phaser.Math.Between(2000, 5000),
                 blink
-            )
-        }
+            );
+        };
 
-        blink()
+        blink();
     }
 }

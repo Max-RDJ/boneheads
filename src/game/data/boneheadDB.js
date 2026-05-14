@@ -1,0 +1,44 @@
+export const BONEHEAD_DB = {
+    julius: {
+        id: "julius",
+        name: "Julius",
+        textures: {
+            idleKey: "julius_idle",
+            blinkKey: "julius_blink",
+            idleUrl: "/assets/julius_idle.png",
+            blinkUrl: "/assets/julius_blink.png"
+        },
+        stats: {
+            accuracy: 5,
+            size: 5
+        }
+    },
+    noggin: {
+        id: "noggin",
+        name: "Noggin",
+        textures: {
+            idleKey: "noggin_idle",
+            blinkKey: "noggin_blink",
+            idleUrl: "/assets/noggin_idle.png",
+            blinkUrl: "/assets/noggin_blink.png"
+        },
+        stats: {
+            accuracy: 4,
+            size: 6
+        }
+    },
+    boomer: {
+        id: "boomer",
+        name: "Boomer",
+        textures: {
+            idleKey: "boomer_idle",
+            blinkKey: "boomer_blink",
+            idleUrl: "/assets/boomer_idle.png",
+            blinkUrl: "/assets/boomer_blink.png"
+        },
+        stats: {
+            accuracy: 6,
+            size: 3
+        }
+    },
+}

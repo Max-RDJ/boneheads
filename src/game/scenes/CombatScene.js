@@ -1,7 +1,8 @@
 import Phaser from 'phaser'
 import BenchSystem from '../systems/BenchSystem'
 import ArenaSystem from '../systems/ArenaSystem';
-import { playerBoneheads } from '../state/boneheads'
+import { playerParty } from '../state/playerParty'
+import { BONEHEAD_DB } from '../data/boneheadDB'
 
 const PLAYER_BATTLE_X = 400;
 const PLAYER_BATTLE_Y = 380;
@@ -14,12 +15,14 @@ export default class CombatScene extends Phaser.Scene {
 
     preload() {
         this.benchSystem = new BenchSystem(this)
-        this.benchSystem.preload(playerBoneheads)
+        this.benchSystem.preload(playerParty)
     }
 
     create() {
         this.arenaSystem = new ArenaSystem(this)
         this.arenaSystem.create()
-        this.benchSystem.create(playerBoneheads)
+
+        this.benchSystem = new BenchSystem(this)
+        this.benchSystem.create(playerParty, BONEHEAD_DB)
     }
 }
