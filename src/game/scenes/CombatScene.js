@@ -1,12 +1,10 @@
 import Phaser from 'phaser'
-import BenchSystem from '../systems/BenchSystem'
-import ArenaSystem from '../systems/ArenaSystem';
+import PlayerBenchSystem from '../systems/PlayerBenchSystem'
+import EnemyBenchSystem from '../systems/EnemyBenchSystem'
+import ArenaSystem from '../systems/ArenaSystem'
+
 import { playerParty } from '../state/playerParty'
 import { enemyParty } from '../state/enemyParty'
-import { BONEHEAD_DB } from '../data/boneheadDB'
-
-const PLAYER_BATTLE_X = 400;
-const PLAYER_BATTLE_Y = 380;
 
 export default class CombatScene extends Phaser.Scene {
 
@@ -15,17 +13,18 @@ export default class CombatScene extends Phaser.Scene {
     }
 
     preload() {
-        this.benchSystem = new BenchSystem(this)
-        this.benchSystem.preload(playerParty)
-        this.benchSystem.preload(enemyParty)
+        this.playerBench = new PlayerBenchSystem(this)
+        this.enemyBench = new EnemyBenchSystem(this)
+
+        this.playerBench.preload(playerParty)
+        this.enemyBench.preload(enemyParty)
     }
 
     create() {
-        this.arenaSystem = new ArenaSystem(this)
-        this.arenaSystem.create()
+        this.arena = new ArenaSystem(this)
+        this.arena.create()
 
-        this.benchSystem = new BenchSystem(this)
-        this.benchSystem.create(playerParty, 'player')
-        this.benchSystem.create(enemyParty, 'enemy')
+        this.playerBench.create(playerParty)
+        this.enemyBench.create(enemyParty)
     }
 }
