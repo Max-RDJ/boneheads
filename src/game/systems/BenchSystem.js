@@ -34,12 +34,16 @@ export default class BenchSystem {
         });
     }
 
-    create(playerParty) {
-        const count = playerParty.length;
+    create(party, side) {
+        const isPlayer = side === 'player';
+
+        const count = party.length;
         const totalWidth = (count - 1) * SLOT_SPACING;
         const startX = (GAME_WIDTH - totalWidth) / 2;
 
-        playerParty.forEach((unit, i) => {
+        const benchY = isPlayer ? 500 : 120; // 👈 enemy top, player bottom
+
+        party.forEach((unit, i) => {
             const data = BONEHEAD_DB[unit.typeId];
             if (!data) return;
 
@@ -47,43 +51,48 @@ export default class BenchSystem {
 
             const sprite = this.scene.add.image(
                 x,
-                PLAYER_BENCH_Y,
+                benchY,
                 data.textures.idleKey
             );
 
             sprite.setDisplaySize(64, 64);
 
             sprite.benchX = x;
-            sprite.benchY = PLAYER_BENCH_Y;
+            sprite.benchY = benchY;
 
             sprite.unitData = unit;
             sprite.boneheadData = data;
 
-            sprite.setInteractive({ cursor: 'pointer' });
-            this.scene.input.setDraggable(sprite);
+            // only player is draggable
+            if (isPlayer) {
+                sprite.setInteractive({ cursor: 'pointer' });
+                this.scene.input.setDraggable(sprite);
 
-            sprite.on('drag', (pointer, dragX, dragY) => {
-                sprite.x = dragX;
-                sprite.y = dragY;
-            });
+                sprite.on('drag', (pointer, dragX, dragY) => {
+                    sprite.x = dragX;
+                    sprite.y = dragY;
+                });
 
-            sprite.on('dragend', () => {
-                const inside =
-                    sprite.x > BATTLE_ZONE.x - BATTLE_ZONE.width / 2 &&
-                    sprite.x < BATTLE_ZONE.x + BATTLE_ZONE.width / 2 &&
-                    sprite.y > BATTLE_ZONE.y - BATTLE_ZONE.height / 2 &&
-                    sprite.y < BATTLE_ZONE.y + BATTLE_ZONE.height / 2;
+                sprite.on('dragend', () => {
+                    const inside =
+                        sprite.x > 400 - 250 &&
+                        sprite.x < 400 + 250 &&
+                        sprite.y > 300 - 110 &&
+                        sprite.y < 300 + 110;
 
-                if (inside) {
-                    this.moveToBattleZone(sprite);
-                } else {
-                    this.returnToBench(sprite);
-                }
-            });
-
-            this.playerBench.push(sprite);
+                    if (inside) this.moveToBattleZone(sprite);
+                    else this.returnToBench(sprite);
+                });
+            }
 
             this.startBlinking(sprite, data);
+
+            if (isPlayer) {
+                this.playerBench.push(sprite);
+            } else {
+                this.opponentBench = this.opponentBench || [];
+                this.opponentBench.push(sprite);
+            }
         });
     }
 
