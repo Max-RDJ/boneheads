@@ -4,9 +4,7 @@ import CombatScene from './scenes/CombatScene'
 import './Game.css'
 
 function Game() {
-
     useEffect(() => {
-
         const config = {
             type: Phaser.AUTO,
             width: 800,
@@ -25,7 +23,9 @@ function Game() {
     }, [])
 
     return (
-        <div id="game-container"></div>
+        <div className="game-wrapper">
+            <div id="game-container"></div>
+        </div>
     )
 }
 
