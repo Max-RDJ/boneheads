@@ -1,0 +1,78 @@
+#game-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.battle-zone {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: min(600px, 90%);
+  height: 300px;
+  border: 1px solid white;
+  padding: 1rem;
+}
+
+.enemy-battlezone,
+.player-battlezone {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.arena {
+  height: 15rem;
+  width: 15rem;
+  border: solid grey 1px;
+}
+
+.player-bench {
+  text-align: center;
+  margin-top: auto;
+  min-width: 80%;
+  margin-top: 1rem;
+}
+
+.opponent,
+.player {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.player-bench,
+.opponent-bench {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  border: 1px solid grey;
+  padding: 0.5rem;
+  min-width: 80%;
+}
+
+.bench-bonehead {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bonehead-image {
+  max-height: 3rem;
+  width: auto;
+}
+
+.bonehead-image:hover {
+  cursor: pointer;
+}
