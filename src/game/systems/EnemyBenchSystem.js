@@ -1,32 +1,65 @@
 import BenchBase from './BenchBase'
 import { BONEHEAD_DB } from '../data/boneheadDB'
+import Phaser from 'phaser'
 
 const START_X = 200
 const SLOT_SPACING = 100
-const ENEMY_Y = 100
+const ENEMY_Y = 120
 
 export default class EnemyBenchSystem extends BenchBase {
 
-    create(party) {
+    constructor(scene) {
+        super(scene)
+        this.slots = []
+        this.slotPositions = []
+    }
 
-        const totalWidth = (party.length - 1) * SLOT_SPACING
+    create(party) {
+        const count = party.length
+        const totalWidth = (count - 1) * SLOT_SPACING
         const startX = (800 - totalWidth) / 2
+
+        for (let i = 0; i < count; i++) {
+            this.slots[i] = null
+
+            this.slotPositions[i] = {
+                x: startX + i * SLOT_SPACING,
+                y: ENEMY_Y
+            }
+        }
+
+        let availableSlots = [...Array(count).keys()]
 
         party.forEach((unit, i) => {
 
             const data = BONEHEAD_DB[unit.typeId]
 
+            const randomIndex = Phaser.Utils.Array.GetRandom(availableSlots)
+
+            Phaser.Utils.Array.Remove(availableSlots, randomIndex)
+
+            const pos = this.slotPositions[randomIndex]
+
             const sprite = this.scene.add.image(
-                startX + i * SLOT_SPACING,
-                ENEMY_Y,
+                startX,
+                -100,
                 data.textures.idleKey
             )
 
             sprite.setDisplaySize(64, 64)
-            sprite.unit = unit
+
+            this.scene.tweens.add({
+                targets: sprite,
+                x: pos.x,
+                y: pos.y,
+                delay: i * 200,
+                duration: 500,
+                ease: 'Power2'
+            })
+
+            this.slots[randomIndex] = sprite
 
             this.startBlinking(sprite, data)
-            this.sprites.push(sprite)
         })
     }
 }

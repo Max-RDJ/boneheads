@@ -163,10 +163,10 @@ export default class PlayerBenchSystem extends BenchBase {
     returnToBench(sprite) {
         this.scene.tweens.add({
             targets: sprite,
-            x: sprite.x,
+            x: this.slotPositions[sprite.slotIndex].x,
             y: PLAYER_Y,
             duration: 250,
             ease: 'Power2'
-        })
+        });
     }
 }
