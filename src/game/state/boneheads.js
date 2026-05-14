@@ -1,13 +1,12 @@
-import juliusIdle from '../assets/julius_idle.png'
-import juliusBlink from '../assets/julius_blink.png'
-
 export const playerBoneheads = [
     {
         id: 1,
         boneheadName: 'Julius',
         textures: {
-            idle: juliusIdle,
-            blink: juliusBlink
+            idleKey: 'julius_idle',
+            blinkKey: 'julius_blink',
+            idleUrl: '/assets/julius_idle.png',
+            blinkUrl: '/assets/julius_blink.png'
         },
         stats: {
             accuracy: 5,

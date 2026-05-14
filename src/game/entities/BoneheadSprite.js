@@ -1,14 +1,14 @@
 class BoneheadSprite {
     constructor(scene, x, y, boneheadData) {
-        this.scene = scene
-        this.data = boneheadData
+        this.scene = scene;
+        this.data = boneheadData;
 
         this.sprite = scene.add.image(
             x,
             y,
-            `${boneheadData.id}-idle`
-        )
+            boneheadData.textures.idle
+        );
 
-        this.startBlinking()
+        this.startBlinking();
     }
 }
