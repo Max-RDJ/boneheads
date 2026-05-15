@@ -57,7 +57,7 @@ export default class CombatScene extends Phaser.Scene {
         this.attackButton.setInteractive({ cursor: 'pointer' })
 
         this.attackButton.on('pointerdown', () => {
-            this.turnSystem.tryResolveTurn()
+            this.turnSystem.takeTurn()
         })
     }
 }

@@ -11,8 +11,6 @@ export default class TurnSystem {
         this.playerBench = []
         this.enemyFighter = null
         this.enemyBench = []
-
-        this.isResolving = false
     }
 
     setPlayerFighter(sprite) {
@@ -31,6 +29,12 @@ export default class TurnSystem {
         this.enemyBench = units
     }
 
+    takeTurn() {
+        if (!this.playerFighter || !this.enemyFighter) return
+
+        this.resolveStep()
+    }
+
     tryResolveTurn() {
         if (!this.playerFighter) return
         if (this.isResolving) return
@@ -39,20 +43,20 @@ export default class TurnSystem {
         this.resolveCombat()
     }
 
-    async resolveCombat() {
+    async resolveStep() {
+        if (this.enemyFighter.isDead) return
+        if (this.playerFighter.isDead) return
+        
         const playerHit = this.combat.attack(
             this.playerFighter,
             this.enemyFighter
         )
 
-        await this.delay(600)
+        await this.delay(500)
 
         if (this.checkWin()) return
 
-        const enemyAlive = !this.enemyFighter.isDead
-
-        if (enemyAlive) {
-
+        if (!this.enemyFighter.isDead) {
             const target = this.pickPlayerTarget()
 
             this.combat.attack(
@@ -60,10 +64,8 @@ export default class TurnSystem {
                 target
             )
 
-            await this.delay(600)
+            await this.delay(500)
         }
-
-        this.resetTurn()
     }
 
     pickPlayerTarget() {
