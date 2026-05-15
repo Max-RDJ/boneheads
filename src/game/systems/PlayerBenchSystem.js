@@ -76,8 +76,12 @@ export default class PlayerBenchSystem extends BenchBase {
                 if (insideBattle) {
                     this.moveToBattle(sprite);
                     this.scene.turnSystem.setPlayerFighter(sprite)
-                    const enemyFighter = this.scene.enemyBench.selectRandomFighter()
-                    this.scene.turnSystem.setEnemyFighter(enemyFighter)
+                    
+                    if (!this.scene.turnSystem.enemyFighter) {
+                        const enemyFighter = this.scene.enemyBench.selectRandomFighter()
+                        this.scene.turnSystem.setEnemyFighter(enemyFighter)
+                    }
+                    
                     this.slots[sprite.slotIndex] = null;
                     return;
                 }
