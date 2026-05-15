@@ -1,7 +1,6 @@
 import BenchBase from './BenchBase'
 import { BONEHEAD_DB } from '../data/boneheadDB'
 import { DEPTH } from '../config/depth'
-import TurnSystem from './TurnSystem'
 
 const START_X = 200
 const SLOT_SPACING = 100
@@ -75,8 +74,10 @@ export default class PlayerBenchSystem extends BenchBase {
                 const insideBattle = this.isInBattleZone(sprite);
 
                 if (insideBattle) {
-                    this.scene.turnSystem.setPlayerUnit(sprite)
                     this.moveToBattle(sprite);
+                    this.scene.turnSystem.setPlayerFighter(sprite)
+                    const enemyFighter = this.scene.enemyBench.selectRandomFighter()
+                    this.scene.turnSystem.setEnemyFighter(enemyFighter)
                     this.slots[sprite.slotIndex] = null;
                     return;
                 }

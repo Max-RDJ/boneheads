@@ -5,6 +5,8 @@ import Phaser from 'phaser'
 const START_X = 200
 const SLOT_SPACING = 100
 const ENEMY_Y = 120
+const ENEMY_BATTLE_X = 400
+const ENEMY_BATTLE_Y = 220
 
 export default class EnemyBenchSystem extends BenchBase {
 
@@ -31,9 +33,7 @@ export default class EnemyBenchSystem extends BenchBase {
         let availableSlots = [...Array(count).keys()]
 
         party.forEach((unit, i) => {
-
             const data = BONEHEAD_DB[unit.typeId]
-
             const randomIndex = Phaser.Utils.Array.GetRandom(availableSlots)
 
             Phaser.Utils.Array.Remove(availableSlots, randomIndex)
@@ -59,9 +59,41 @@ export default class EnemyBenchSystem extends BenchBase {
             })
 
             this.slots[randomIndex] = sprite
+            this.sprites.push(sprite)
 
             this.startBlinking(sprite, data)
         })
+    }
+
+    getActiveUnits() {
+        return this.sprites.filter(s => !s.isDead)
+    }
+
+    selectRandomFighter() {
+        const alive = this.sprites.filter(s => !s.isDead)
+
+        if (!alive.length) {
+            return null
+        }
+
+        const fighter =
+            Phaser.Utils.Array.GetRandom(alive)
+
+        this.moveToBattle(fighter)
+
+        return fighter
+    }
+
+    moveToBattle(sprite) {
+        this.scene.tweens.add({
+            targets: sprite,
+            x: ENEMY_BATTLE_X,
+            y: ENEMY_BATTLE_Y,
+            duration: 300,
+            ease: 'Power2'
+        })
+
+        this.activeUnit = sprite
     }
 
     getActiveUnits() {

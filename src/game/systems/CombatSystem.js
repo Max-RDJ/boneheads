@@ -1,39 +1,69 @@
 import { BONEHEAD_DB } from '../data/boneheadDB'
 
+
 export default class CombatSystem {
     constructor(scene) {
         this.scene = scene
     }
 
-    getHitChance(attacker, defender) {
-        const acc = attacker.stats.accuracy;
-        const size = defender.stats.size;
+    getHitChance(attackerStats, defenderStats) {
+        const acc = attackerStats.accuracy
+        const size = defenderStats.size
 
-        let chance = acc / (acc + size);
+        let chance = acc / (acc + size)
 
-        const variance = (Math.random() - 0.5) * 0.2;
-        chance += variance;
+        const variance =
+            (Math.random() - 0.5) * 0.2
 
-        return Math.min(0.95, Math.max(0.05, chance));
+        chance += variance
+
+        return Math.min(
+            0.95,
+            Math.max(0.05, chance)
+        )
     }
 
     attack(attackerSprite, defenderSprite) {
-        if (!attackerSprite?.unit || !defenderSprite?.unit) {
+        if (!attackerSprite || !defenderSprite) {
+            console.warn('Missing sprites')
+            return false
+        }
+
+        if (!attackerSprite.unit || !defenderSprite.unit) {
             console.warn('Missing unit data:', attackerSprite, defenderSprite)
             return false
         }
 
+        const attackerData =
+            BONEHEAD_DB[attackerSprite.unit.typeId]
+
+        const defenderData =
+            BONEHEAD_DB[defenderSprite.unit.typeId]
+
+        if (!attackerData || !defenderData) {
+            console.warn('Missing bonehead DB data')
+            return false
+        }
+
         const chance = this.getHitChance(
-            attackerSprite.unit,
-            defenderSprite.unit
+            attackerData.stats,
+            defenderData.stats
+        )
+
+        console.log(
+            `${attackerData.name} attacks ${defenderData.name}`,
+            `(${Math.round(chance * 100)}% hit chance)`
         )
 
         const hit = Math.random() < chance
 
         if (hit) {
+            console.log('HIT')
             this.defeat(defenderSprite)
             return true
         }
+
+        console.log('MISS')
 
         return false
     }

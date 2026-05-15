@@ -7,63 +7,56 @@ export default class TurnSystem {
         this.scene = scene
         this.combat = new CombatSystem(scene)
 
-        this.playerUnit = null
-        this.enemyUnit = null
+        this.playerFighter = null
+        this.playerBench = []
+        this.enemyFighter = null
+        this.enemyBench = []
 
         this.isResolving = false
     }
 
-    setPlayerUnit(sprite) {
-        this.playerUnit = sprite
-
-        this.tryResolveTurn()
+    setPlayerFighter(sprite) {
+        this.playerFighter = sprite
     }
 
-    setEnemyUnits(enemySprites) {
-        this.enemyUnits = enemySprites
+    setPlayerBench(units) {
+        this.playerBench = units
     }
 
-    pickTarget() {
-        const alive = (this.enemyUnits || []).filter(e => !e.isDead)
-        if (!alive.length) return null
-        return Phaser.Utils.Array.GetRandom(alive)
+    setEnemyFighter(sprite) {
+        this.enemyFighter = sprite
+    }
+
+    setEnemyBench(units) {
+        this.enemyBench = units
     }
 
     tryResolveTurn() {
-        if (!this.playerUnit) return
+        if (!this.playerFighter) return
         if (this.isResolving) return
 
         this.isResolving = true
-
-        this.enemyUnit = this.pickTarget()
-
         this.resolveCombat()
-    }
-
-    pickTarget() {
-        const alive = this.enemyUnits.filter(e => !e.isDead)
-
-        return alive[Math.floor(Math.random() * alive.length)]
     }
 
     async resolveCombat() {
         const playerHit = this.combat.attack(
-            this.playerUnit,
-            this.enemyUnit
+            this.playerFighter,
+            this.enemyFighter
         )
 
         await this.delay(600)
 
         if (this.checkWin()) return
 
-        const enemyAlive = !this.enemyUnit.isDead
+        const enemyAlive = !this.enemyFighter.isDead
 
         if (enemyAlive) {
 
             const target = this.pickPlayerTarget()
 
             this.combat.attack(
-                this.enemyUnit,
+                this.enemyFighter,
                 target
             )
 
@@ -74,18 +67,17 @@ export default class TurnSystem {
     }
 
     pickPlayerTarget() {
-        return this.playerUnit
+        return this.playerFighter
     }
 
     resetTurn() {
-        this.playerUnit = null
-        this.enemyUnit = null
+        this.playerFighter = null
+        this.enemyFighter = null
         this.isResolving = false
     }
 
     checkWin() {
-        const allDead = this.enemyUnits.every(e => e.isDead)
-
+        const allDead = (this.enemyBench || []).every(e => e.isDead)
         if (allDead) {
             console.log("PLAYER WINS")
             return true
