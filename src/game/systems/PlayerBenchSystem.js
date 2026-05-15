@@ -59,31 +59,55 @@ export default class PlayerBenchSystem extends BenchBase {
             this.scene.input.setDraggable(sprite)
 
             sprite.on('dragstart', () => {
+                if (this.activeUnit === sprite) {
+                    return
+                }
+
                 sprite.setDepth(DEPTH.dragging)
             })
 
             sprite.on('drag', (p, x, y) => {
+                if (this.activeUnit === sprite) {
+                    return
+                }
+
                 sprite.x = x
                 sprite.y = y
             })
 
             sprite.on('dragend', () => {
-                sprite.setDepth(DEPTH.player);
+                if (this.activeUnit === sprite) {
+                    this.moveToBattle(sprite)
+                    return
+                }
+
+                sprite.setDepth(DEPTH.player)
 
                 const slotIndex = this.getNearestSlot(sprite.x, sprite.y);
                 const insideBattle = this.isInBattleZone(sprite);
 
                 if (insideBattle) {
-                    this.moveToBattle(sprite);
+                    const currentFighter = this.activeUnit
+
+                    if (currentFighter && currentFighter !== sprite) {
+                        this.snapToSlot(sprite, sprite.slotIndex)
+                        return
+                    }
+
+                    this.moveToBattle(sprite)
+
                     this.scene.turnSystem.setPlayerFighter(sprite)
-                    
+
                     if (!this.scene.turnSystem.enemyFighter) {
-                        const enemyFighter = this.scene.enemyBench.selectRandomFighter()
+                        const enemyFighter =
+                            this.scene.enemyBench.selectRandomFighter()
+
                         this.scene.turnSystem.setEnemyFighter(enemyFighter)
                     }
-                    
-                    this.slots[sprite.slotIndex] = null;
-                    return;
+
+                    this.slots[sprite.slotIndex] = null
+
+                    return
                 }
 
                 if (slotIndex !== -1) {
@@ -175,5 +199,21 @@ export default class PlayerBenchSystem extends BenchBase {
             duration: 250,
             ease: 'Power2'
         });
+    }
+
+    getActiveUnits() {
+        return this.sprites.filter(sprite => !sprite.isDead)
+    }
+
+    returnActiveToBench() {
+        if (!this.activeUnit) {
+            return
+        }
+
+        const sprite = this.activeUnit
+
+        this.slots[sprite.slotIndex] = sprite
+        this.returnToBench(sprite)
+        this.activeUnit = null
     }
 }

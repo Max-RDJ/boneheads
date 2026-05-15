@@ -32,6 +32,10 @@ export default class CombatScene extends Phaser.Scene {
         this.enemyBench = new EnemyBenchSystem(this)
 
         this.playerBench.create(playerParty)
+        this.turnSystem.setPlayerBench(
+            this.playerBench.getActiveUnits()
+        )
+        
         this.enemyBench.create(enemyParty)
         this.turnSystem.setEnemyBench(
             this.enemyBench.getActiveUnits()

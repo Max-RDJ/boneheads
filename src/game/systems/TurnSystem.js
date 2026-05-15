@@ -87,6 +87,11 @@ export default class TurnSystem {
             this.combat.attack(player, enemy, false)
         }
 
+        if (player.isDead) {
+            this.scene.playerBench.activeUnit = null
+            this.playerFighter = null
+        }
+
         if (this.checkWin() || this.checkLoss()) {
             this.resetTurn()
             return
@@ -115,12 +120,26 @@ export default class TurnSystem {
 
         this.combat.attack(enemy, player, defenderGuarding)
 
+        if (player.isDead) {
+            this.scene.playerBench.activeUnit = null
+            this.playerFighter = null
+        }
+
         if (this.checkWin() || this.checkLoss()) {
             this.resetTurn()
             return
         }
 
         await this.delay(500)
+
+        const survivedGuard =
+            playerIsGuarding &&
+            !player.isDead
+
+        if (survivedGuard) {
+            this.scene.playerBench.returnActiveToBench()
+            this.playerFighter = null
+        }
 
         player.isGuarding = false
 
@@ -152,7 +171,13 @@ export default class TurnSystem {
     }
 
     checkLoss() {
-        const allDead = (this.playerBench || []).every(p => p.isDead)
+        const bench = this.playerBench || []
+
+        const allDead =
+            bench.length > 0 &&
+            bench.every(p => p.isDead)
+
+        console.log('Checking loss condition:', allDead)
 
         if (allDead) {
             console.log("ENEMY WINS")
