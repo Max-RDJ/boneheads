@@ -87,10 +87,7 @@ export default class TurnSystem {
             this.combat.attack(player, enemy, false)
         }
 
-        if (player.isDead) {
-            this.scene.playerBench.activeUnit = null
-            this.playerFighter = null
-        }
+        this.clearDeadPlayerFighter()
 
         if (this.checkWin() || this.checkLoss()) {
             this.resetTurn()
@@ -112,18 +109,20 @@ export default class TurnSystem {
                 return
             }
 
-            this.resetTurn()
-            return
+            await this.delay(500)
         }
 
         const defenderGuarding = player.isGuarding === true
 
-        this.combat.attack(enemy, player, defenderGuarding)
+        const currentEnemy = this.enemyFighter
 
-        if (player.isDead) {
-            this.scene.playerBench.activeUnit = null
-            this.playerFighter = null
-        }
+        this.combat.attack(
+            currentEnemy,
+            player,
+            defenderGuarding
+        )
+        
+        this.clearDeadPlayerFighter()
 
         if (this.checkWin() || this.checkLoss()) {
             this.resetTurn()
@@ -185,6 +184,16 @@ export default class TurnSystem {
         }
 
         return false
+    }
+
+    clearDeadPlayerFighter() {
+        if (
+            this.playerFighter &&
+            this.playerFighter.isDead
+        ) {
+            this.scene.playerBench.activeUnit = null
+            this.playerFighter = null
+        }
     }
 
     selectNextEnemyFighter() {
