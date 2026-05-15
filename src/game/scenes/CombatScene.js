@@ -37,12 +37,15 @@ export default class CombatScene extends Phaser.Scene {
             this.enemyBench.getActiveUnits()
         )
 
+        this.playerAction = null
+        this.playerGuarding = false
+
         this.attackButton = this.add.text(
-            650,
-            540,
+            660,
+            230,
             'ATTACK',
             {
-                fontSize: '32px',
+                fontSize: '30px',
                 fontFamily: 'Arial',
                 backgroundColor: '#aa2222',
                 padding: {
@@ -57,7 +60,30 @@ export default class CombatScene extends Phaser.Scene {
         this.attackButton.setInteractive({ cursor: 'pointer' })
 
         this.attackButton.on('pointerdown', () => {
-            this.turnSystem.takeTurn()
+            this.turnSystem.takeTurn('attack')
+        })
+
+        this.guardButton = this.add.text(
+            660,
+            300,
+            'GUARD',
+            {
+                fontSize: '30px',
+                fontFamily: 'Arial',
+                backgroundColor: '#228aaa',
+                padding: {
+                    left: 16,
+                    right: 16,
+                    top: 8,
+                    bottom: 8
+                }
+            }
+        )
+
+        this.guardButton.setInteractive({ cursor: 'pointer' })
+
+        this.guardButton.on('pointerdown', () => {
+            this.turnSystem.takeTurn('guard')
         })
     }
 }

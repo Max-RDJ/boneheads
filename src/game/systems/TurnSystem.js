@@ -11,6 +11,9 @@ export default class TurnSystem {
         this.playerBench = []
         this.enemyFighter = null
         this.enemyBench = []
+
+        this.isResolving = false
+        this.playerAction = null
     }
 
     setPlayerFighter(sprite) {
@@ -29,23 +32,20 @@ export default class TurnSystem {
         this.enemyBench = units
     }
 
-    takeTurn() {
-        if (!this.playerFighter || !this.enemyFighter) return
-
-        this.resolveStep()
-    }
-
-    tryResolveTurn() {
+    takeTurn(action) {
         if (!this.playerFighter) return
         if (this.isResolving) return
+        if (!this.enemyFighter) return
 
+        this.playerAction = action
         this.isResolving = true
+
         this.resolveCombat()
     }
 
     async resolveStep() {
-        if (this.enemyFighter.isDead) return
-        if (this.playerFighter.isDead) return
+        if (!this.enemyFighter || this.enemyFighter.isDead) return
+        if (!this.playerFighter || this.playerFighter.isDead) return
         
         const playerHit = this.combat.attack(
             this.playerFighter,
@@ -55,6 +55,10 @@ export default class TurnSystem {
         await this.delay(500)
 
         if (this.checkWin()) return
+
+        if (this.enemyFighter.isDead) {
+            this.enemyFighter = this.selectNextEnemyFighter()
+        }
 
         if (!this.enemyFighter.isDead) {
             const target = this.pickPlayerTarget()
@@ -68,24 +72,98 @@ export default class TurnSystem {
         }
     }
 
+    async resolveCombat() {
+        const player = this.playerFighter
+        const enemy = this.enemyFighter
+
+        if (!player || !enemy) {
+            this.resetTurn()
+            return
+        }
+
+        const playerIsGuarding = this.playerAction === 'guard'
+
+        if (this.playerAction === 'attack') {
+            this.combat.attack(player, enemy, false)
+        }
+
+        if (this.checkWin() || this.checkLoss()) {
+            this.resetTurn()
+            return
+        }
+
+        if (playerIsGuarding) {
+            player.isGuarding = true
+        }
+
+        await this.delay(500)
+
+        if (enemy.isDead) {
+            this.enemyFighter = this.selectNextEnemyFighter()
+
+            if (!this.enemyFighter) {
+                console.log("PLAYER WINS")
+                this.resetTurn()
+                return
+            }
+
+            this.resetTurn()
+            return
+        }
+
+        const defenderGuarding = player.isGuarding === true
+
+        this.combat.attack(enemy, player, defenderGuarding)
+
+        if (this.checkWin() || this.checkLoss()) {
+            this.resetTurn()
+            return
+        }
+
+        await this.delay(500)
+
+        player.isGuarding = false
+
+        this.resetTurn()
+    }
+
     pickPlayerTarget() {
         return this.playerFighter
     }
 
     resetTurn() {
-        this.playerFighter = null
-        this.enemyFighter = null
+        this.playerAction = null
         this.isResolving = false
+
+        if (this.playerFighter) {
+            this.playerFighter.isGuarding = false
+        }
     }
 
     checkWin() {
         const allDead = (this.enemyBench || []).every(e => e.isDead)
+
         if (allDead) {
             console.log("PLAYER WINS")
             return true
         }
 
         return false
+    }
+
+    checkLoss() {
+        const allDead = (this.playerBench || []).every(p => p.isDead)
+
+        if (allDead) {
+            console.log("ENEMY WINS")
+            return true
+        }
+
+        return false
+    }
+
+    selectNextEnemyFighter() {
+        return this.scene.enemyBench.selectRandomFighter()
     }
 
     delay(ms) {

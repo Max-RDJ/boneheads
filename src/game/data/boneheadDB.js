@@ -10,7 +10,7 @@ export const BONEHEAD_DB = {
         },
         stats: {
             accuracy: 5,
-            size: 5
+            defence: 5
         }
     },
     noggin: {
@@ -24,7 +24,7 @@ export const BONEHEAD_DB = {
         },
         stats: {
             accuracy: 4,
-            size: 6
+            defence: 6
         }
     },
     boomer: {
@@ -38,7 +38,7 @@ export const BONEHEAD_DB = {
         },
         stats: {
             accuracy: 6,
-            size: 3
+            defence: 3
         }
     },
 }

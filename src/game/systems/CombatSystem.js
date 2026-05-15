@@ -1,16 +1,19 @@
 import { BONEHEAD_DB } from '../data/boneheadDB'
 
-
 export default class CombatSystem {
     constructor(scene) {
         this.scene = scene
     }
 
-    getHitChance(attackerStats, defenderStats) {
+    getHitChance(attackerStats, defenderStats, defenderGuarding) {
         const acc = attackerStats.accuracy
-        const size = defenderStats.size
+        let defence = defenderStats.defence
 
-        let chance = acc / (acc + size)
+        if (defenderGuarding) {
+            defence *= 2
+        }
+
+        let chance = acc / (acc + defence)
 
         const variance =
             (Math.random() - 0.5) * 0.2
@@ -23,7 +26,7 @@ export default class CombatSystem {
         )
     }
 
-    attack(attackerSprite, defenderSprite) {
+    attack(attackerSprite, defenderSprite, defenderGuarding = false) {
         if (!attackerSprite || !defenderSprite) {
             console.warn('Missing sprites')
             return false
@@ -47,7 +50,8 @@ export default class CombatSystem {
 
         const chance = this.getHitChance(
             attackerData.stats,
-            defenderData.stats
+            defenderData.stats,
+            defenderGuarding
         )
 
         console.log(
