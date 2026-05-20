@@ -63,6 +63,10 @@ export default class PlayerBenchSystem extends BenchBase {
                     return
                 }
 
+                this.scene.showBattleZoneHighlight(
+                    !this.activeUnit
+                )
+
                 sprite.setDepth(DEPTH.dragging)
             })
 
@@ -73,9 +77,26 @@ export default class PlayerBenchSystem extends BenchBase {
 
                 sprite.x = x
                 sprite.y = y
+
+                const insideBattle =
+                    this.isInBattleZone(sprite)
+
+                if (insideBattle) {
+                    const canDrop =
+                        !this.activeUnit ||
+                        this.activeUnit === sprite
+
+                    this.scene.showBattleZoneHighlight(
+                        canDrop
+                    )
+                } else {
+                    this.scene.hideBattleZoneHighlight()
+                }
             })
 
             sprite.on('dragend', () => {
+                this.scene.hideBattleZoneHighlight()
+                
                 if (this.activeUnit === sprite) {
                     this.moveToBattle(sprite)
                     return
