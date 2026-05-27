@@ -1,6 +1,5 @@
-import Phaser from 'phaser'
 import CombatSystem from './CombatSystem'
-import { BONEHEAD_DB } from '../data/boneheadDB'
+
 
 export default class TurnSystem {
     constructor(scene) {
@@ -47,10 +46,10 @@ export default class TurnSystem {
         if (!this.enemyFighter || this.enemyFighter.isDead) return
         if (!this.playerFighter || this.playerFighter.isDead) return
         
-        const playerHit = this.combat.attack(
+        /* const playerHit = this.combat.attack(
             this.playerFighter,
             this.enemyFighter
-        )
+        ) */
 
         await this.delay(500)
 

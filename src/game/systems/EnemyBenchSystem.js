@@ -94,8 +94,4 @@ export default class EnemyBenchSystem extends BenchBase {
 
         this.activeUnit = sprite
     }
-
-    getActiveUnits() {
-        return this.sprites.filter(s => !s.isDead)
-    }
 }
