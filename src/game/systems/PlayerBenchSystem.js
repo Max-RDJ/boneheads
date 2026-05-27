@@ -2,7 +2,6 @@ import BenchBase from './BenchBase'
 import { BONEHEAD_DB } from '../data/boneheadDB'
 import { DEPTH } from '../config/depth'
 
-const START_X = 200
 const SLOT_SPACING = 100
 const PLAYER_Y = 500
 

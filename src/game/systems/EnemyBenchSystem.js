@@ -2,7 +2,6 @@ import BenchBase from './BenchBase'
 import { BONEHEAD_DB } from '../data/boneheadDB'
 import Phaser from 'phaser'
 
-const START_X = 200
 const SLOT_SPACING = 100
 const ENEMY_Y = 120
 const ENEMY_BATTLE_X = 400
