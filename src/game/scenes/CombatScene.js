@@ -5,8 +5,20 @@ import PlayerBenchSystem from '../systems/PlayerBenchSystem'
 import EnemyBenchSystem from '../systems/EnemyBenchSystem'
 import TurnSystem from '../systems/TurnSystem'
 
-import { playerParty } from '../state/playerParty'
+import { playerData } from '../state/playerData'
 import { enemyParty } from '../state/enemyParty'
+
+
+function getActivePartyUnits() {
+    return playerData.activeParty.map(id =>
+        playerData.collection.find(
+            unit => unit.instanceId === id
+        )
+    )
+}
+
+const activeUnits = getActivePartyUnits()
+
 
 export default class CombatScene extends Phaser.Scene {
 
@@ -18,7 +30,7 @@ export default class CombatScene extends Phaser.Scene {
         this.playerBench = new PlayerBenchSystem(this)
         this.enemyBench = new EnemyBenchSystem(this)
 
-        this.playerBench.preload(playerParty)
+    this.playerBench.preload(activeUnits)
         this.enemyBench.preload(enemyParty)
     }
 
@@ -33,7 +45,7 @@ export default class CombatScene extends Phaser.Scene {
         this.playerBench = new PlayerBenchSystem(this)
         this.enemyBench = new EnemyBenchSystem(this)
 
-        this.playerBench.create(playerParty)
+        this.playerBench.preload(activeUnits)
         this.turnSystem.setPlayerBench(
             this.playerBench.getActiveUnits()
         )
