@@ -1,6 +1,9 @@
 import Phaser from 'phaser'
 import { BONEHEAD_DB } from '../data/boneheadDB'
 import { playerData } from '../state/playerData'
+import { UIButton } from '../ui/uiButton'
+import { UI_STYLES } from '../ui/styles'
+
 
 export default class ShopScene extends Phaser.Scene {
 
@@ -33,6 +36,7 @@ export default class ShopScene extends Phaser.Scene {
         this.createBoneheadMarket()
         this.createBoosterSection()
         this.createInventoryButtons()
+        this.createStartBattleButton()
     }
 
     generateInstanceId() {
@@ -43,7 +47,6 @@ export default class ShopScene extends Phaser.Scene {
     }
 
     createBoneheadMarket() {
-
         this.add.text(
             50,
             100,
@@ -264,5 +267,16 @@ export default class ShopScene extends Phaser.Scene {
         this.goldText.setText(
             `Gold: ${playerData.gold}`
         )
+    }
+
+    createStartBattleButton() {
+        new UIButton(this, 600, 520, 'START BATTLE', UI_STYLES.button, () => {
+            console.log(playerData.activeParty)
+            if (playerData.activeParty.length === 0) {
+                alert('You must have at least one Bonehead in your active party to start a battle!')
+                return
+            }
+            this.scene.start('CombatScene')
+        })
     }
 }

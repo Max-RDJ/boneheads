@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import Phaser from 'phaser'
 import CombatScene from './scenes/CombatScene'
+import ShopScene from './scenes/ShopScene'
 import './Game.css'
 
 function Game() {
@@ -11,7 +12,10 @@ function Game() {
             height: 600,
             parent: 'game-container',
             transparent: true,
-            scene: [CombatScene]
+            scene: [
+                ShopScene,
+                CombatScene
+            ]
         }
 
         const game = new Phaser.Game(config)
