@@ -11,7 +11,8 @@ export const BONEHEAD_DB = {
         stats: {
             accuracy: 5,
             defence: 5
-        }
+        },
+        price: 10
     },
     noggin: {
         id: "noggin",
@@ -25,7 +26,8 @@ export const BONEHEAD_DB = {
         stats: {
             accuracy: 4,
             defence: 6
-        }
+        },
+        price: 2
     },
     boomer: {
         id: "boomer",
@@ -39,6 +41,7 @@ export const BONEHEAD_DB = {
         stats: {
             accuracy: 6,
             defence: 3
-        }
+        },
+        price: 3
     },
 }

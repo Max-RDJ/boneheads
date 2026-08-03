@@ -1,5 +1,5 @@
 export const playerData = {
-    gold: 100,
+    coins: 100,
 
     collection: [
     ],

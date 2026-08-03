@@ -1,10 +1,22 @@
 import Phaser from 'phaser'
 
 export class UIButton extends Phaser.GameObjects.Text {
-    constructor(scene, x, y, label, style, onClick) {
-        super(scene, x, y, label, style)
+    constructor(scene, x, y, label, style, onClick, overrides = {}) {
+
+        super(
+            scene,
+            x,
+            y,
+            label,
+            {
+                ...style,
+                ...overrides
+            }
+        )
 
         scene.add.existing(this)
+
+        this.setOrigin(0.5)
 
         this.setInteractive({ useHandCursor: true })
 

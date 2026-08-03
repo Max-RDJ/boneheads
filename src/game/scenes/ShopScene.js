@@ -1,6 +1,11 @@
 import Phaser from 'phaser'
 import { BONEHEAD_DB } from '../data/boneheadDB'
 import { playerData } from '../state/playerData'
+
+import { BoneheadCard } from '../ui/BoneheadCard'
+import { CoinCounter } from '../ui/CoinCounter'
+
+import { Tooltip } from '../ui/Tooltip'
 import { UIButton } from '../ui/uiButton'
 import { UI_STYLES } from '../ui/styles'
 
@@ -13,25 +18,20 @@ export default class ShopScene extends Phaser.Scene {
 
     create() {
 
-        this.goldText = this.add.text(
+        this.coinCounter = new CoinCounter(
+            this,
             20,
-            20,
-            `Gold: ${playerData.gold}`,
-            {
-                fontSize: '24px',
-                color: '#ffff00'
-            }
+            20
         )
 
         this.add.text(
             400,
             40,
-            'BONEHEAD SHOP',
-            {
-                fontSize: '32px',
-                color: '#ffffff'
-            }
+            'SHOP',
+            UI_STYLES.title
         ).setOrigin(0.5)
+
+        this.tooltip = new Tooltip(this)
 
         this.createBoneheadMarket()
         this.createBoosterSection()
@@ -47,13 +47,12 @@ export default class ShopScene extends Phaser.Scene {
     }
 
     createBoneheadMarket() {
+
         this.add.text(
             50,
             100,
-            'Available Boneheads',
-            {
-                fontSize: '24px'
-            }
+            'Singles',
+            UI_STYLES.subtitle
         )
 
         const ids = Object.keys(BONEHEAD_DB)
@@ -62,6 +61,7 @@ export default class ShopScene extends Phaser.Scene {
             [...ids]
         ).slice(0, 3)
 
+
         selections.forEach((id, index) => {
 
             const bonehead = BONEHEAD_DB[id]
@@ -69,57 +69,33 @@ export default class ShopScene extends Phaser.Scene {
             const x = 100 + index * 220
             const y = 180
 
-            this.add.rectangle(
+
+            new BoneheadCard(
+                this,
                 x,
                 y,
-                180,
-                120,
-                0x333333
+                bonehead,
+                this.buyBonehead.bind(this),
+                this.tooltip
             )
-
-            this.add.text(
-                x,
-                y - 30,
-                bonehead.name,
-                {
-                    fontSize: '20px'
-                }
-            ).setOrigin(0.5)
-
-            const buyButton = this.add.text(
-                x,
-                y + 20,
-                'BUY (20g)',
-                {
-                    backgroundColor: '#228822',
-                    padding: {
-                        left: 10,
-                        right: 10,
-                        top: 5,
-                        bottom: 5
-                    }
-                }
-            )
-                .setOrigin(0.5)
-                .setInteractive()
-
-            buyButton.on('pointerdown', () => {
-
-                if (playerData.gold < 20) {
-                    return
-                }
-
-                playerData.gold -= 20
-
-                playerData.collection.push({
-                    instanceId: this.generateInstanceId(),
-                    typeId: id
-                })
-
-                this.refreshGold()
-                this.showInventory()
-            })
         })
+    }
+
+    buyBonehead(bonehead) {
+
+        if (playerData.coins < bonehead.price) {
+            return
+        }
+
+        playerData.coins -= bonehead.price
+
+        playerData.collection.push({
+            instanceId: this.generateInstanceId(),
+            typeId: bonehead.id
+        })
+
+        this.refreshCoins()
+        this.showInventory()
     }
 
     createBoosterSection() {
@@ -128,34 +104,27 @@ export default class ShopScene extends Phaser.Scene {
             50,
             330,
             'Booster Packs',
-            {
-                fontSize: '24px'
-            }
+            UI_STYLES.subtitle
         )
 
         const packButton = this.add.text(
             100,
             390,
-            'OPEN BOOSTER (50g)',
+            'Open Booster (50g)',
+            UI_STYLES.button,
             {
-                backgroundColor: '#4444aa',
-                padding: {
-                    left: 12,
-                    right: 12,
-                    top: 8,
-                    bottom: 8
-                }
+                backgroundColor: '#4444aa'
             }
         )
             .setInteractive()
 
         packButton.on('pointerdown', () => {
 
-            if (playerData.gold < 50) {
+            if (playerData.coins < 50) {
                 return
             }
 
-            playerData.gold -= 50
+            playerData.coins -= 50
 
             const ids = Object.keys(BONEHEAD_DB)
 
@@ -170,7 +139,7 @@ export default class ShopScene extends Phaser.Scene {
                 })
             }
 
-            this.refreshGold()
+            this.refreshCoins()
             this.showInventory()
         })
     }
@@ -181,53 +150,11 @@ export default class ShopScene extends Phaser.Scene {
             550,
             350,
             'VIEW INVENTORY',
-            {
-                backgroundColor: '#666666',
-                padding: {
-                    left: 12,
-                    right: 12,
-                    top: 8,
-                    bottom: 8
-                }
-            }
+            UI_STYLES.button
         )
             .setInteractive()
 
         inventoryButton.on('pointerdown', () => {
-            this.showInventory()
-        })
-
-        const removeButton = this.add.text(
-            550,
-            420,
-            'REMOVE LAST BONEHEAD (5g)',
-            {
-                backgroundColor: '#aa2222',
-                padding: {
-                    left: 12,
-                    right: 12,
-                    top: 8,
-                    bottom: 8
-                }
-            }
-        )
-            .setInteractive()
-
-        removeButton.on('pointerdown', () => {
-
-            if (playerData.collection.length === 0) {
-                return
-            }
-
-            if (playerData.gold < 5) {
-                return
-            }
-
-            playerData.gold -= 5
-
-            playerData.collection.pop()
-
-            this.refreshGold()
             this.showInventory()
         })
     }
@@ -263,20 +190,20 @@ export default class ShopScene extends Phaser.Scene {
         )
     }
 
-    refreshGold() {
-        this.goldText.setText(
-            `Gold: ${playerData.gold}`
-        )
+    refreshCoins() {
+        this.coinCounter.setAmount(playerData.coins)
     }
 
     createStartBattleButton() {
-        new UIButton(this, 600, 520, 'START BATTLE', UI_STYLES.button, () => {
+        new UIButton(this, 600, 520, 'Next Round', UI_STYLES.button, () => {
             console.log(playerData.activeParty)
             if (playerData.activeParty.length === 0) {
                 alert('You must have at least one Bonehead in your active party to start a battle!')
                 return
             }
             this.scene.start('CombatScene')
-        })
+        },
+        {backgroundColor: '#aa2222'}
+    )
     }
 }
