@@ -1,9 +1,14 @@
 import Phaser from 'phaser'
 import { BONEHEAD_DB } from '../data/boneheadDB'
+import { BOOSTER_DB } from '../data/boosterDB'
 import { playerData } from '../state/playerData'
 
 import { BoneheadCard } from '../ui/BoneheadCard'
 import { CoinCounter } from '../ui/CoinCounter'
+import { SHOP_LAYOUT } from '../ui/layout'
+import { Panel } from '../ui/Panel'
+
+import { centerText } from '../ui/utils/centerText'
 
 import { Tooltip } from '../ui/Tooltip'
 import { UIButton } from '../ui/uiButton'
@@ -17,19 +22,19 @@ export default class ShopScene extends Phaser.Scene {
     }
 
     create() {
-
         this.coinCounter = new CoinCounter(
             this,
             20,
             20
         )
 
-        this.add.text(
+        centerText(
+            this,
             400,
             40,
             'SHOP',
             UI_STYLES.title
-        ).setOrigin(0.5)
+        )
 
         this.tooltip = new Tooltip(this)
 
@@ -47,27 +52,35 @@ export default class ShopScene extends Phaser.Scene {
     }
 
     createBoneheadMarket() {
+        const panel = SHOP_LAYOUT.panels.market
 
-        this.add.text(
-            50,
-            100,
-            'Singles',
-            UI_STYLES.subtitle
+        new Panel(
+            this,
+            panel.x,
+            panel.y,
+            panel.width,
+            panel.height,
+            {
+                title: 'Singles'
+            }
         )
 
-        const ids = Object.keys(BONEHEAD_DB)
+        const boneheadIds = Object.keys(BONEHEAD_DB)
 
-        const selections = Phaser.Utils.Array.Shuffle(
-            [...ids]
+        const boneheadSelections = Phaser.Utils.Array.Shuffle(
+            [...boneheadIds]
         ).slice(0, 3)
 
 
-        selections.forEach((id, index) => {
+        const boneheadLayout = SHOP_LAYOUT.boneheads
+
+
+        boneheadSelections.forEach((id, index) => {
 
             const bonehead = BONEHEAD_DB[id]
 
-            const x = 100 + index * 220
-            const y = 180
+            const x = panel.x + boneheadLayout.offsetX + index * boneheadLayout.spacing
+            const y = panel.y + boneheadLayout.offsetY
 
 
             new BoneheadCard(
@@ -82,7 +95,6 @@ export default class ShopScene extends Phaser.Scene {
     }
 
     buyBonehead(bonehead) {
-
         if (playerData.coins < bonehead.price) {
             return
         }
@@ -99,19 +111,60 @@ export default class ShopScene extends Phaser.Scene {
     }
 
     createBoosterSection() {
+        const panel = SHOP_LAYOUT.panels.boosters
 
-        this.add.text(
-            50,
-            330,
-            'Booster Packs',
-            UI_STYLES.subtitle
+        new Panel(
+            this,
+            panel.x,
+            panel.y,
+            panel.width,
+            panel.height,
+            {
+                title: 'Booster Packs'
+            }
         )
 
-        const packButton = this.add.text(
+        const boosterIds = Object.keys(BONEHEAD_DB)
+
+         const boosterSelections = Phaser.Utils.Array.Shuffle(
+            [...boosterIds]
+        ).slice(0, 3)
+
+
+        const boneheadLayout = SHOP_LAYOUT.boneheads
+
+
+        boosterSelections.forEach((id, index) => {
+
+            const booster = BOOSTER_DB[id]
+
+            const x = panel.x + boneheadLayout.offsetX + index * boneheadLayout.spacing
+            const y = panel.y + boneheadLayout.offsetY
+
+
+            new BoosterCard(
+                this,
+                x,
+                y,
+                booster,
+                this.buyBooster.bind(this),
+                this.tooltip
+            )
+        })
+
+        new BoneheadCard(
+                this,
+                x,
+                y,
+                bonehead,
+                this.buyBonehead.bind(this),
+                this.tooltip
+            )
+
+        const boosterCard = this.add.text(
             100,
             390,
             'Open Booster (50g)',
-            UI_STYLES.button,
             {
                 backgroundColor: '#4444aa'
             }
