@@ -218,26 +218,47 @@ export default class ShopScene extends Phaser.Scene {
             }
             this.scene.start('CombatScene')
         },
-        {backgroundColor: '#aa2222'}
-    )
+        {
+            backgroundColor: '#aa2222',
+            width: 200
+        })
     }
 
     createRerollButton() {
-        new UIButton(this, 650, 230, `Reroll\n¢${this.calculateRerollCost()}`, UI_STYLES.button, () => {
-            const rerollCost = this.calculateRerollCost()
+        this.rerollButton = new UIButton(
+            this,
+            650,
+            230,
+            `Reroll\n¢${this.calculateRerollCost()}`,
+            UI_STYLES.button,
+            () => {
+                const rerollCost = this.calculateRerollCost()
 
-            if (playerData.coins < rerollCost) {
-                alert('Not enough coins to reroll!')
-                return
-            } else {
+                if (playerData.coins < rerollCost) {
+                    alert('Not enough coins to reroll!')
+                    return
+                }
+
                 playerData.coins -= rerollCost
                 playerData.rerollCount = (playerData.rerollCount || 0) + 1
+
                 this.boneheadCards.forEach(card => card.destroy())
+
                 this.createBoneheadMarket()
-            }
-            this.refreshCoins()
-        },
-    )
+                this.updateRerollButtonText()
+                this.refreshCoins()
+
+                this.rerollButton.disableInteractive()
+                this.rerollButton.setInteractive()
+            },
+            { width: 200 }
+        )
+    }
+
+    updateRerollButtonText() {
+        this.rerollButton.setText(
+            `Reroll\n¢${this.calculateRerollCost()}`
+        )
     }
 
     calculateRerollCost() {
@@ -245,6 +266,7 @@ export default class ShopScene extends Phaser.Scene {
         const costMultiplier = 1.5
         const rerollCount = playerData.rerollCount || 0
 
-        return baseCost + (rerollCount * costMultiplier)
+        return Math.ceil(baseCost + (rerollCount * costMultiplier))
     }
+
 }
