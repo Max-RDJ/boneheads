@@ -6,7 +6,7 @@ export const SHOP_LAYOUT = {
         market: {
             x: 30,
             y: 110,
-            width: 740,
+            width: 480,
             height: 160
         },
 
@@ -14,14 +14,14 @@ export const SHOP_LAYOUT = {
             x: 30,
             y: 330,
             width: 350,
-            height: 190
+            height: 250
         },
 
-        inventory: {
+        paint: {
             x: 450,
             y: 330,
             width: 320,
-            height: 190
+            height: 250
         }
     },
 
@@ -33,7 +33,7 @@ export const SHOP_LAYOUT = {
 
     boosters: {
         offsetX: 100,
-        offsetY: 120,
+        offsetY: 150,
         spacing: 140
     },
 

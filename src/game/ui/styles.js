@@ -3,6 +3,7 @@ export const UI_STYLES = {
     button: {
         fontFamily: 'Luckiest Guy',
         fontSize: '22px',
+        align: 'center',
         color: '#ffffff',
         backgroundColor: '#2f9e44',
         stroke: '#154d1f',

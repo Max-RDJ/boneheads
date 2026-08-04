@@ -74,7 +74,7 @@ export class BoosterCard extends Phaser.GameObjects.Container {
             booster.textures.key
         )
 
-        this.image.setScale(0.2)
+        this.image.setScale(0.35)
 
         this.image.setInteractive({
             useHandCursor: true
@@ -91,7 +91,7 @@ export class BoosterCard extends Phaser.GameObjects.Container {
 
         this.priceText = this.scene.add.text(
             0,
-            30,
+            70,
             `¢${booster.price}`,
             UI_STYLES.bodySmall
         ).setOrigin(0.5)

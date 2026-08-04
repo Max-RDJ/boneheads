@@ -45,6 +45,8 @@ export default class InventoryScene extends Phaser.Scene {
         {backgroundColor: '#6a6a6a'})
     }
 
+    // createPaintSection()
+
     showInventory() {
 
         const boneheads = playerData.bag.map(unit => {

@@ -54,6 +54,7 @@ export default class ShopScene extends Phaser.Scene {
         this.createBoosterMarket()
         this.createPaintMarket()
         this.createStartBattleButton()
+        this.createRerollButton()
     }
 
     generateInstanceId() {
@@ -85,7 +86,7 @@ export default class ShopScene extends Phaser.Scene {
 
 
         const boneheadLayout = SHOP_LAYOUT.boneheads
-
+        this.boneheadCards = []
 
         boneheadSelections.forEach((id, index) => {
 
@@ -94,8 +95,7 @@ export default class ShopScene extends Phaser.Scene {
             const x = panel.x + boneheadLayout.offsetX + index * boneheadLayout.spacing
             const y = panel.y + boneheadLayout.offsetY
 
-
-            new BoneheadCard(
+            const card = new BoneheadCard(
                 this,
                 x,
                 y,
@@ -103,6 +103,9 @@ export default class ShopScene extends Phaser.Scene {
                 this.buyBonehead.bind(this),
                 this.tooltip
             )
+
+            card.boneheadId = bonehead.id
+            this.boneheadCards.push(card)
         })
     }
 
@@ -113,13 +116,28 @@ export default class ShopScene extends Phaser.Scene {
 
         playerData.coins -= bonehead.price
 
-        playerData.collection.push({
+        playerData.bag.push({
             instanceId: this.generateInstanceId(),
             typeId: bonehead.id
         })
 
+        const card = this.boneheadCards.find(
+            card => card.boneheadId === bonehead.id
+        )
+
+        if (card) {
+            this.tooltip.hide()
+            card.destroy()
+
+            this.add.text(
+                card.x,
+                card.y - 20,
+                'SOLD!',
+                UI_STYLES.bodySmall
+            ).setOrigin(0.5)
+        }
+
         this.refreshCoins()
-        this.showInventory()
     }
 
     createBoosterMarket() {
@@ -171,7 +189,7 @@ export default class ShopScene extends Phaser.Scene {
 
 
     createPaintMarket() {
-        const panel = SHOP_LAYOUT.panels.inventory
+        const panel = SHOP_LAYOUT.panels.paint
 
         new Panel(
             this,
@@ -192,7 +210,7 @@ export default class ShopScene extends Phaser.Scene {
     }
 
     createStartBattleButton() {
-        new UIButton(this, 600, 520, 'Next Round', UI_STYLES.button, () => {
+        new UIButton(this, 650, 160, 'Next Round', UI_STYLES.button, () => {
             console.log(playerData.activeParty)
             if (playerData.activeParty.length === 0) {
                 alert('You must have at least one Bonehead in your active party to start a battle!')
@@ -202,5 +220,31 @@ export default class ShopScene extends Phaser.Scene {
         },
         {backgroundColor: '#aa2222'}
     )
+    }
+
+    createRerollButton() {
+        new UIButton(this, 650, 230, `Reroll\n¢${this.calculateRerollCost()}`, UI_STYLES.button, () => {
+            const rerollCost = this.calculateRerollCost()
+
+            if (playerData.coins < rerollCost) {
+                alert('Not enough coins to reroll!')
+                return
+            } else {
+                playerData.coins -= rerollCost
+                playerData.rerollCount = (playerData.rerollCount || 0) + 1
+                this.boneheadCards.forEach(card => card.destroy())
+                this.createBoneheadMarket()
+            }
+            this.refreshCoins()
+        },
+    )
+    }
+
+    calculateRerollCost() {
+        const baseCost = 10
+        const costMultiplier = 1.5
+        const rerollCount = playerData.rerollCount || 0
+
+        return baseCost + (rerollCount * costMultiplier)
     }
 }
