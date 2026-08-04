@@ -9,15 +9,23 @@ import { playerData } from '../state/playerData'
 import { enemyParty } from '../state/enemyParty'
 
 
-function getActivePartyUnits() {
-    return playerData.activeParty.map(id =>
-        playerData.collection.find(
+function getPlayerUnits() {
+    return playerData.bag.map(id =>
+        playerData.bag.find(
             unit => unit.instanceId === id
         )
     )
 }
 
-const activeUnits = getActivePartyUnits()
+function getEnemyUnits() {
+    return enemyParty.bag.map(id =>
+        enemyParty.bag.find(
+            unit => unit.instanceId === id
+        )
+    )
+}
+const playerUnits = getPlayerUnits()
+const enemyUnits = getEnemyUnits()
 
 
 export default class CombatScene extends Phaser.Scene {
@@ -30,7 +38,7 @@ export default class CombatScene extends Phaser.Scene {
         this.playerBench = new PlayerBenchSystem(this)
         this.enemyBench = new EnemyBenchSystem(this)
 
-    this.playerBench.preload(activeUnits)
+    this.playerBench.preload(playerUnits)
         this.enemyBench.preload(enemyParty)
     }
 
@@ -45,14 +53,14 @@ export default class CombatScene extends Phaser.Scene {
         this.playerBench = new PlayerBenchSystem(this)
         this.enemyBench = new EnemyBenchSystem(this)
 
-        this.playerBench.preload(activeUnits)
+        this.playerBench.preload(playerUnits)
         this.turnSystem.setPlayerBench(
-            this.playerBench.getActiveUnits()
+            this.playerBench.getPlayerUnits()
         )
 
         this.enemyBench.create(enemyParty)
         this.turnSystem.setEnemyBench(
-            this.enemyBench.getActiveUnits()
+            this.enemyBench.getEnemyUnits()
         )
 
         this.playerAction = null

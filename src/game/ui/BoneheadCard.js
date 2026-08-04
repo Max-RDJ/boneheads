@@ -3,7 +3,7 @@ import { UI_STYLES } from './styles'
 
 export class BoneheadCard extends Phaser.GameObjects.Container {
 
-    constructor(scene, x, y, bonehead, onBuy, tooltip) {
+    constructor(scene, x, y, bonehead, onBuy, tooltip, options = {}) {
 
         super(scene, x, y)
 
@@ -14,7 +14,10 @@ export class BoneheadCard extends Phaser.GameObjects.Container {
 
         scene.add.existing(this)
 
-        this.createPriceText(bonehead)
+        if (options.showPrice !== false) {
+            this.createPriceText(bonehead)
+        }
+
         this.createImage(bonehead)
 
         this.setSize(180, 120)

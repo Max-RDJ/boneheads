@@ -1,9 +1,7 @@
 export const playerData = {
     coins: 100,
 
-    collection: [
+    bag: [
     ],
 
-    activeParty: [
-    ]
 }

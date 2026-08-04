@@ -2,7 +2,10 @@ import { useEffect } from 'react'
 import Phaser from 'phaser'
 
 import PreloadScene from './scenes/PreloadScene'
+
+import BoosterScene from './scenes/BoosterScene'
 import CombatScene from './scenes/CombatScene'
+import InventoryScene from './scenes/InventoryScene'
 import ShopScene from './scenes/ShopScene'
 
 import './Game.css'
@@ -17,8 +20,10 @@ function Game() {
             transparent: true,
             scene: [
                 PreloadScene,
+                BoosterScene,
+                CombatScene,
+                InventoryScene,
                 ShopScene,
-                CombatScene
             ]
         }
 

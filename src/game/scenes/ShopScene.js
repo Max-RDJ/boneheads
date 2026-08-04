@@ -3,7 +3,10 @@ import { BONEHEAD_DB } from '../data/boneheadDB'
 import { BOOSTER_DB } from '../data/boosterDB'
 import { playerData } from '../state/playerData'
 
+import { BagIcon } from '../ui/BagIcon'
 import { BoneheadCard } from '../ui/BoneheadCard'
+import { BoosterCard } from '../ui/BoosterCard'
+import { BoosterScene } from './BoosterScene'
 import { CoinCounter } from '../ui/CoinCounter'
 import { SHOP_LAYOUT } from '../ui/layout'
 import { Panel } from '../ui/Panel'
@@ -22,10 +25,19 @@ export default class ShopScene extends Phaser.Scene {
     }
 
     create() {
+        this.tooltip = new Tooltip(this)
+
         this.coinCounter = new CoinCounter(
             this,
-            20,
-            20
+            680,
+            30
+        )
+
+        this.bagIcon  = new BagIcon(
+            this,
+            600,
+            30,
+            this.tooltip
         )
 
         centerText(
@@ -39,8 +51,8 @@ export default class ShopScene extends Phaser.Scene {
         this.tooltip = new Tooltip(this)
 
         this.createBoneheadMarket()
-        this.createBoosterSection()
-        this.createInventoryButtons()
+        this.createBoosterMarket()
+        this.createPaintMarket()
         this.createStartBattleButton()
     }
 
@@ -110,7 +122,7 @@ export default class ShopScene extends Phaser.Scene {
         this.showInventory()
     }
 
-    createBoosterSection() {
+    createBoosterMarket() {
         const panel = SHOP_LAYOUT.panels.boosters
 
         new Panel(
@@ -124,23 +136,16 @@ export default class ShopScene extends Phaser.Scene {
             }
         )
 
-        const boosterIds = Object.keys(BONEHEAD_DB)
-
-         const boosterSelections = Phaser.Utils.Array.Shuffle(
+        const boosterIds = Object.keys(BOOSTER_DB)
+        const boosterSelections = Phaser.Utils.Array.Shuffle(
             [...boosterIds]
-        ).slice(0, 3)
-
-
-        const boneheadLayout = SHOP_LAYOUT.boneheads
-
+        ).slice(0, 2)
+        const boosterLayout = SHOP_LAYOUT.boosters
 
         boosterSelections.forEach((id, index) => {
-
             const booster = BOOSTER_DB[id]
-
-            const x = panel.x + boneheadLayout.offsetX + index * boneheadLayout.spacing
-            const y = panel.y + boneheadLayout.offsetY
-
+            const x = panel.x + boosterLayout.offsetX + index * boosterLayout.spacing
+            const y = panel.y + boosterLayout.offsetY
 
             new BoosterCard(
                 this,
@@ -149,99 +154,38 @@ export default class ShopScene extends Phaser.Scene {
                 booster,
                 this.buyBooster.bind(this),
                 this.tooltip
-            )
+            )  
         })
+    }
 
-        new BoneheadCard(
-                this,
-                x,
-                y,
-                bonehead,
-                this.buyBonehead.bind(this),
-                this.tooltip
-            )
-
-        const boosterCard = this.add.text(
-            100,
-            390,
-            'Open Booster (50g)',
-            {
-                backgroundColor: '#4444aa'
-            }
-        )
-            .setInteractive()
-
-        packButton.on('pointerdown', () => {
-
-            if (playerData.coins < 50) {
+        buyBooster(booster) {
+            if (playerData.coins < booster.price) {
                 return
             }
 
-            playerData.coins -= 50
-
-            const ids = Object.keys(BONEHEAD_DB)
-
-            for (let i = 0; i < 3; i++) {
-
-                const randomId =
-                    Phaser.Utils.Array.GetRandom(ids)
-
-                playerData.collection.push({
-                    instanceId: this.generateInstanceId(),
-                    typeId: randomId
-                })
-            }
-
+            playerData.coins -= booster.price
             this.refreshCoins()
-            this.showInventory()
-        })
-    }
 
-    createInventoryButtons() {
-
-        const inventoryButton = this.add.text(
-            550,
-            350,
-            'VIEW INVENTORY',
-            UI_STYLES.button
-        )
-            .setInteractive()
-
-        inventoryButton.on('pointerdown', () => {
-            this.showInventory()
-        })
-    }
-
-    showInventory() {
-
-        if (this.inventoryText) {
-            this.inventoryText.destroy()
+            this.scene.start('BoosterScene', { boosterId: booster.id })
         }
 
-        const names = playerData.collection.map(unit => {
 
-            const bonehead =
-                BONEHEAD_DB[unit.typeId]
+    createPaintMarket() {
+        const panel = SHOP_LAYOUT.panels.inventory
 
-            return `${bonehead.name}`
-        })
-
-        this.inventoryText = this.add.text(
-            520,
-            120,
-            names.join('\n') || 'No Boneheads',
+        new Panel(
+            this,
+            panel.x,
+            panel.y,
+            panel.width,
+            panel.height,
             {
-                fontSize: '18px',
-                backgroundColor: '#222222',
-                padding: {
-                    left: 10,
-                    right: 10,
-                    top: 10,
-                    bottom: 10
-                }
+                title: 'Paint'
             }
         )
+
     }
+    
 
     refreshCoins() {
         this.coinCounter.setAmount(playerData.coins)

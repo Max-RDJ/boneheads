@@ -1,21 +1,26 @@
 import Phaser from 'phaser'
+
+import { BONEHEAD_DB } from '../data/boneheadDB'
+import { BOOSTER_DB } from '../data/boosterDB'
+import { playerData } from '../state/playerData'
+
 import { UI_STYLES } from './styles'
 
-export class BoneheadCard extends Phaser.GameObjects.Container {
+export class BoosterCard extends Phaser.GameObjects.Container {
 
-    constructor(scene, x, y, bonehead, onBuy, tooltip) {
+    constructor(scene, x, y, booster, onBuy, tooltip) {
 
         super(scene, x, y)
 
         this.scene = scene
-        this.bonehead = bonehead
+        this.booster = booster
         this.tooltip = tooltip
         this.onBuy = onBuy
 
         scene.add.existing(this)
 
-        this.createPriceText(bonehead)
-        this.createImage(bonehead)
+        this.createPriceText(booster)
+        this.createImage(booster)
 
         this.setSize(180, 120)
         this.setInteractive(
@@ -34,9 +39,8 @@ export class BoneheadCard extends Phaser.GameObjects.Container {
 
             this.tooltip.show(
                 pointer,
-                `${this.bonehead.name}
-                Accuracy: ${this.bonehead.stats.accuracy}
-                Defence: ${this.bonehead.stats.defence}`
+                `${this.booster.name}
+                Description: ${this.booster.description}`
             )
         })
 
@@ -51,9 +55,8 @@ export class BoneheadCard extends Phaser.GameObjects.Container {
 
             this.tooltip.show(
                 pointer,
-                `${this.bonehead.name}
-                Accuracy: ${this.bonehead.stats.accuracy}
-                Defence: ${this.bonehead.stats.defence}`
+                `${this.booster.name}
+                Description: ${this.booster.description}`
             )
 
         })
@@ -63,33 +66,33 @@ export class BoneheadCard extends Phaser.GameObjects.Container {
         })
     }
 
-    createImage(bonehead) {
+    createImage(booster) {
 
         this.image = this.scene.add.image(
             0,
             -25,
-            bonehead.textures.idleKey
+            booster.textures.key
         )
 
-        this.image.setDisplaySize(60, 60)
+        this.image.setScale(0.2)
 
         this.image.setInteractive({
             useHandCursor: true
         })
 
         this.image.on('pointerdown', () => {
-            this.onBuy(bonehead)
+            this.onBuy(booster)
         })
 
         this.add(this.image)
     }
 
-    createPriceText(bonehead) {
+    createPriceText(booster) {
 
         this.priceText = this.scene.add.text(
             0,
             30,
-            `¢${bonehead.price}`,
+            `¢${booster.price}`,
             UI_STYLES.bodySmall
         ).setOrigin(0.5)
         

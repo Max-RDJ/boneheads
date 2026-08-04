@@ -5,29 +5,41 @@ export const SHOP_LAYOUT = {
     panels: {
         market: {
             x: 30,
-            y: 90,
+            y: 110,
             width: 740,
-            height: 200
+            height: 160
         },
 
         boosters: {
             x: 30,
             y: 330,
             width: 350,
-            height: 160
+            height: 190
         },
 
         inventory: {
             x: 450,
             y: 330,
             width: 320,
-            height: 160
+            height: 190
         }
     },
 
     boneheads: {
         offsetX: 70,
-        offsetY: 110,
-        spacing: 220
+        offsetY: 100,
+        spacing: 120
+    },
+
+    boosters: {
+        offsetX: 100,
+        offsetY: 120,
+        spacing: 140
+    },
+
+    inventory: {
+        offsetX: 470,
+        offsetY: 350,
+        spacing: 80
     }
 }

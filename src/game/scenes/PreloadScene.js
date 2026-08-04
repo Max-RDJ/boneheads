@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import { BONEHEAD_DB } from '../data/boneheadDB'
+import { BOOSTER_DB } from '../data/boosterDB'
 
 export default class PreloadScene extends Phaser.Scene {
 
@@ -21,6 +22,18 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.font(
             'Luckiest Guy',
             '../fonts/LuckiestGuy.ttf'
+        )
+
+        Object.values(BOOSTER_DB).forEach((booster) => {
+            this.load.image(
+                booster.textures.key,
+                booster.textures.url
+            )
+        })
+
+        this.load.image(
+            'bag',
+            '/assets/bag.png'
         )
     }
 
