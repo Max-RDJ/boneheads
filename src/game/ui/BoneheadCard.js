@@ -1,7 +1,6 @@
 import Phaser from 'phaser'
 
 import { COLOURS } from './ColourMap'
-import { BONEHEAD_DB } from '../data/boneheadDB'
 import { UI_STYLES } from './styles'
 
 export class BoneheadCard extends Phaser.GameObjects.Container {
