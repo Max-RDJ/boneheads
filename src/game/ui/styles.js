@@ -58,8 +58,8 @@ export const UI_STYLES = {
 
     bodySmall: {
         fontFamily: 'Luckiest Guy',
-        fontSize: '18px',
-        fontWeight: 'light',
+        fontSize: '20px',
+        fontWeight: 100,
         color: '#ffffff',
         stroke: '#222222',
         strokeThickness: 1

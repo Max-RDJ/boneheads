@@ -1,11 +1,13 @@
 import Phaser from 'phaser'
 import { BONEHEAD_DB } from '../data/boneheadDB'
 import { BOOSTER_DB } from '../data/boosterDB'
+import { PAINT_DB } from '../data/paintDB'
 import { playerData } from '../state/playerData'
 
 import { BagIcon } from '../ui/BagIcon'
 import { BoneheadCard } from '../ui/BoneheadCard'
 import { BoosterCard } from '../ui/BoosterCard'
+import { PaintCard } from '../ui/PaintCard'
 import { BoosterScene } from './BoosterScene'
 import { CoinCounter } from '../ui/CoinCounter'
 import { SHOP_LAYOUT } from '../ui/layout'
@@ -48,8 +50,6 @@ export default class ShopScene extends Phaser.Scene {
             UI_STYLES.title
         )
 
-        this.tooltip = new Tooltip(this)
-
         this.createBoneheadMarket()
         this.createBoosterMarket()
         this.createPaintMarket()
@@ -82,7 +82,7 @@ export default class ShopScene extends Phaser.Scene {
 
         const boneheadSelections = Phaser.Utils.Array.Shuffle(
             [...boneheadIds]
-        ).slice(0, 3)
+        ).slice(0, 4)
 
 
         const boneheadLayout = SHOP_LAYOUT.boneheads
@@ -118,7 +118,8 @@ export default class ShopScene extends Phaser.Scene {
 
         playerData.bag.push({
             instanceId: this.generateInstanceId(),
-            typeId: bonehead.id
+            typeId: bonehead.id,
+            colour: bonehead.colour
         })
 
         const card = this.boneheadCards.find(
@@ -157,7 +158,7 @@ export default class ShopScene extends Phaser.Scene {
         const boosterIds = Object.keys(BOOSTER_DB)
         const boosterSelections = Phaser.Utils.Array.Shuffle(
             [...boosterIds]
-        ).slice(0, 2)
+        ).slice(0, 3)
         const boosterLayout = SHOP_LAYOUT.boosters
 
         boosterSelections.forEach((id, index) => {
@@ -187,7 +188,6 @@ export default class ShopScene extends Phaser.Scene {
             this.scene.start('BoosterScene', { boosterId: booster.id })
         }
 
-
     createPaintMarket() {
         const panel = SHOP_LAYOUT.panels.paint
 
@@ -202,15 +202,70 @@ export default class ShopScene extends Phaser.Scene {
             }
         )
 
+        const paintIds = Object.keys(PAINT_DB)
+        const paintSelections = Phaser.Utils.Array.Shuffle(
+            [...paintIds]
+        ).slice(0, 4)
+        const paintLayout = SHOP_LAYOUT.paint
+
+        this.paintCards = []
+
+        paintSelections.forEach((id, index) => {
+            const paint = PAINT_DB[id]
+            const column = index % 2
+            const row = Math.floor(index / 2)
+            const x = panel.x + paintLayout.offsetX + column * paintLayout.spacing
+            const y = panel.y + paintLayout.offsetY + row * paintLayout.spacing
+
+            new PaintCard(
+                this,
+                x,
+                y,
+                paint,
+                this.buyPaint.bind(this),
+                this.tooltip
+            )  
+        })
     }
-    
+
+        buyPaint(paint) {
+            if (playerData.coins < paint.price) {
+                return
+            }
+
+            playerData.coins -= paint.price
+
+            playerData.paint.push({
+                instanceId: this.generateInstanceId(),
+                typeId: paint.id,
+                colour: paint.colour
+            })
+
+            const card = this.paintCards.find(
+                card => card.paintId === paint.id
+            )
+
+            if (card) {
+                this.tooltip.hide()
+                card.destroy()
+
+                this.add.text(
+                    card.x,
+                    card.y - 20,
+                    'SOLD!',
+                    UI_STYLES.bodySmall
+                ).setOrigin(0.5)
+            }
+
+            this.refreshCoins()
+        }   
 
     refreshCoins() {
         this.coinCounter.setAmount(playerData.coins)
     }
 
     createStartBattleButton() {
-        new UIButton(this, 650, 160, 'Next Round', UI_STYLES.button, () => {
+        new UIButton(this, 650, 150, 'Next Round', UI_STYLES.button, () => {
             console.log(playerData.activeParty)
             if (playerData.activeParty.length === 0) {
                 alert('You must have at least one Bonehead in your active party to start a battle!')
@@ -219,7 +274,7 @@ export default class ShopScene extends Phaser.Scene {
             this.scene.start('CombatScene')
         },
         {
-            backgroundColor: '#aa2222',
+            backgroundColor: '0xaa2222',
             width: 200
         })
     }
@@ -251,7 +306,11 @@ export default class ShopScene extends Phaser.Scene {
                 this.rerollButton.disableInteractive()
                 this.rerollButton.setInteractive()
             },
-            { width: 200 }
+            {
+                width: 200,
+                height: 75,
+                backgroundColor: 0x154d1f
+            }
         )
     }
 

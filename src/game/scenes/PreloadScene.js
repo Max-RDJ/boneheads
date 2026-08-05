@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import { BONEHEAD_DB } from '../data/boneheadDB'
 import { BOOSTER_DB } from '../data/boosterDB'
+import { PAINT_DB } from '../data/paintDB'
 
 export default class PreloadScene extends Phaser.Scene {
 
@@ -16,7 +17,6 @@ export default class PreloadScene extends Phaser.Scene {
                 bonehead.textures.idleKey,
                 bonehead.textures.idleUrl
             )
-
         })
 
         this.load.font(
@@ -31,10 +31,18 @@ export default class PreloadScene extends Phaser.Scene {
             )
         })
 
+        Object.values(PAINT_DB).forEach((paint) => {
+            this.load.image(
+                paint.textures.key,
+                paint.textures.url
+            )
+        })
+
         this.load.image(
             'bag',
             '/assets/bag.png'
         )
+
     }
 
     create() {

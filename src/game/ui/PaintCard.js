@@ -1,30 +1,28 @@
 import Phaser from 'phaser'
 
 import { COLOURS } from './ColourMap'
-import { BONEHEAD_DB } from '../data/boneheadDB'
 import { UI_STYLES } from './styles'
 
-export class BoneheadCard extends Phaser.GameObjects.Container {
+export class PaintCard extends Phaser.GameObjects.Container {
 
-    constructor(scene, x, y, bonehead, onBuy, tooltip, options = {}) {
+    constructor(scene, x, y, paint, onBuy, tooltip, options = {}) {
 
         super(scene, x, y)
 
         this.scene = scene
-        this.bonehead = bonehead
+        this.paint = paint
         this.tooltip = tooltip
         this.onBuy = onBuy
 
         scene.add.existing(this)
 
         if (options.showPrice !== false) {
-            this.createPriceText(bonehead)
+            this.createPriceText(paint)
         }
 
-        this.createImage(bonehead)
+        this.createImage(paint)
 
         this.setSize(180, 120)
-
         this.setInteractive(
             new Phaser.Geom.Rectangle(
                 -30,
@@ -36,6 +34,20 @@ export class BoneheadCard extends Phaser.GameObjects.Container {
         )
 
         this.setupHover()
+
+        this.image.on('pointermove', pointer => {
+
+            this.tooltip.show(
+                pointer,
+                this.paint.name,
+                this.paint.description,
+                COLOURS[this.paint.colour]
+            )
+        })
+
+        this.image.on('pointerout', () => {
+            this.tooltip.hide()
+        })
     }
 
     setupHover() {
@@ -44,9 +56,9 @@ export class BoneheadCard extends Phaser.GameObjects.Container {
 
             this.tooltip.show(
                 pointer,
-                this.bonehead.name,
-                `Accuracy: ${this.bonehead.stats.accuracy}\nDefence: ${this.bonehead.stats.defence}`,
-                COLOURS[this.bonehead.colour]
+                this.paint.name,
+                this.paint.description,
+                COLOURS[this.paint.colour]
             )
 
         })
@@ -56,12 +68,12 @@ export class BoneheadCard extends Phaser.GameObjects.Container {
         })
     }
 
-    createImage(bonehead) {
+    createImage(paint) {
 
         this.image = this.scene.add.image(
             0,
             -25,
-            bonehead.textures.idleKey
+            paint.textures.key
         )
 
         this.image.setDisplaySize(60, 60)
@@ -72,22 +84,22 @@ export class BoneheadCard extends Phaser.GameObjects.Container {
 
         this.image.on('pointerdown', () => {
             if (this.onBuy) {
-                this.onBuy(bonehead)
+                this.onBuy(paint)
             }
         })
 
         this.add(this.image)
     }
 
-    createPriceText(bonehead) {
+    createPriceText(paint) {
 
         this.priceText = this.scene.add.text(
             0,
-            30,
-            `¢${bonehead.price}`,
+            20,
+            `¢${paint.price}`,
             UI_STYLES.bodySmall
         ).setOrigin(0.5)
-
+        
         this.add(this.priceText)
     }
 }

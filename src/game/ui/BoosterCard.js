@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 
 import { BONEHEAD_DB } from '../data/boneheadDB'
 import { BOOSTER_DB } from '../data/boosterDB'
+import { COLOURS } from './ColourMap'
 import { playerData } from '../state/playerData'
 
 import { UI_STYLES } from './styles'
@@ -39,8 +40,9 @@ export class BoosterCard extends Phaser.GameObjects.Container {
 
             this.tooltip.show(
                 pointer,
-                `${this.booster.name}
-                Description: ${this.booster.description}`
+                this.booster.name,
+                this.booster.description,
+                COLOURS[this.booster.colour]
             )
         })
 
@@ -55,8 +57,9 @@ export class BoosterCard extends Phaser.GameObjects.Container {
 
             this.tooltip.show(
                 pointer,
-                `${this.booster.name}
-                Description: ${this.booster.description}`
+                this.booster.name,
+                this.booster.description,
+                COLOURS[this.booster.colour]
             )
 
         })

@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+
 import { UI_STYLES } from './styles'
 
 export class Tooltip extends Phaser.GameObjects.Container {
@@ -9,60 +10,118 @@ export class Tooltip extends Phaser.GameObjects.Container {
 
         scene.add.existing(this)
 
+        this.tooltipWidth = 240
+        this.tooltipHeight = 0
+
         this.background = scene.add.rectangle(
-            120,
-            50,
-            240,
-            100,
+            this.tooltipWidth / 2,
+            this.tooltipHeight / 2,
+            this.tooltipWidth,
+            this.tooltipHeight,
             0x222222
         )
-        .setStrokeStyle(2, 0xffffff)
+            .setStrokeStyle(2, 0xffffff)
 
-        this.text = scene.add.text(
+        this.titleText = scene.add.text(
             10,
+            8,
+            '',
+            {
+                ...UI_STYLES.bodySmall,
+                stroke: '#111111',
+                strokeThickness: 1
+            }
+        )
+
+        this.descriptionText = scene.add.text(
             10,
+            35,
             '',
             {
                 ...UI_STYLES.bodySmall,
                 wordWrap: {
-                    width: 220
+                    width: this.tooltipWidth - 20
                 }
             }
         )
 
         this.add([
             this.background,
-            this.text
+            this.titleText,
+            this.descriptionText
         ])
+
+        this.setSize(
+            this.tooltipWidth,
+            this.tooltipHeight
+        )
 
         this.setDepth(10000)
         this.setVisible(false)
     }
 
-    show(pointer, content) {
+    show(pointer, title, description, titleColour = 0xffffff) {
 
-        this.text.setText(content)
+        this.titleText.setText(title)
+        this.descriptionText.setText(description)
 
-        const offsetX = 15
-        const offsetY = 15
+        this.titleText.setColor(
+            Phaser.Display.Color.IntegerToColor(titleColour).rgba
+        )
 
-        let x = pointer.worldX + offsetX
-        let y = pointer.worldY + offsetY
+        const padding = 10
+        const gap = 5
+
+        this.tooltipHeight =
+        this.titleText.height +
+        gap +
+        this.descriptionText.height +
+        padding * 2
+
+        this.background.setSize(
+            this.tooltipWidth,
+            this.tooltipHeight
+        )
+
+        this.background.setPosition(
+            this.tooltipWidth / 2,
+            this.tooltipHeight / 2
+        )
+
+        this.setSize(
+            this.tooltipWidth,
+            this.tooltipHeight
+        )
+
+        const offset = 15
+
+        let x = pointer.worldX + offset
+        let y = pointer.worldY + offset
+
+        const screenWidth = this.scene.scale.width
+        const screenHeight = this.scene.scale.height
+
+        if (x + this.tooltipWidth > screenWidth) {
+            x = pointer.worldX - this.tooltipWidth - offset
+        }
+
+        if (y + this.tooltipHeight > screenHeight) {
+            y = pointer.worldY - this.tooltipHeight - offset
+        }
 
         x = Phaser.Math.Clamp(
             x,
-            this.width / 2,
-            this.scene.scale.width - this.width / 2
+            0,
+            screenWidth - this.tooltipWidth
         )
 
         y = Phaser.Math.Clamp(
             y,
-            this.height / 2,
-            this.scene.scale.height - this.height / 2
+            0,
+            screenHeight - this.tooltipHeight
         )
 
         this.setPosition(x, y)
-
         this.setVisible(true)
     }
 

@@ -13,33 +13,33 @@ export const SHOP_LAYOUT = {
         boosters: {
             x: 30,
             y: 330,
-            width: 350,
+            width: 450,
             height: 250
         },
 
         paint: {
-            x: 450,
+            x: 510,
             y: 330,
-            width: 320,
+            width: 260,
             height: 250
         }
     },
 
     boneheads: {
-        offsetX: 70,
+        offsetX: 75,
         offsetY: 100,
-        spacing: 120
+        spacing: 110
     },
 
     boosters: {
-        offsetX: 100,
+        offsetX: 85,
         offsetY: 150,
         spacing: 140
     },
 
-    inventory: {
-        offsetX: 470,
-        offsetY: 350,
-        spacing: 80
+    paint: {
+        offsetX: 80,
+        offsetY: 100,
+        spacing: 100
     }
 }
