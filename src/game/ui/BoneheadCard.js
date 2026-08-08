@@ -57,10 +57,13 @@ export class BoneheadCard extends Phaser.GameObjects.Container {
 
     createImage(bonehead) {
 
+        const textureKey =
+            `${bonehead.id}_idle_${bonehead.colour}`
+
         this.image = this.scene.add.image(
             0,
             -25,
-            bonehead.textures.idleKey
+            textureKey
         )
 
         this.image.setDisplaySize(60, 60)

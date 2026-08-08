@@ -2,7 +2,6 @@ export const BONEHEAD_DB = {
     julius: {
         id: "julius",
         name: "Julius",
-        colour: "blue",
         textures: {
             idleKey: "julius_idle",
             blinkKey: "julius_blink",
@@ -15,15 +14,15 @@ export const BONEHEAD_DB = {
         },
         price: 10
     },
-    noggin: {
-        id: "noggin",
-        name: "Noggin",
-        colour: "blue",
+
+    beefhead: {
+        id: "beefhead",
+        name: "Beefhead",
         textures: {
-            idleKey: "noggin_idle",
-            blinkKey: "noggin_blink",
-            idleUrl: "/assets/noggin_idle.png",
-            blinkUrl: "/assets/noggin_blink.png"
+            idleKey: "beefhead_idle",
+            blinkKey: "beefhead_blink",
+            idleUrl: "/assets/beefhead_idle.png",
+            blinkUrl: "/assets/beefhead_blink.png"
         },
         stats: {
             accuracy: 4,
@@ -31,10 +30,10 @@ export const BONEHEAD_DB = {
         },
         price: 2
     },
-    boomer: {
-        id: "boomer",
-        name: "Boomer",
-        colour: "blue",
+
+    ploder: {
+        id: "ploder",
+        name: "Ploder",
         textures: {
             idleKey: "boomer_idle",
             blinkKey: "boomer_blink",
@@ -47,10 +46,10 @@ export const BONEHEAD_DB = {
         },
         price: 3
     },
+
     cookie: {
         id: "cookie",
         name: "Cookie",
-        colour: "blue",
         textures: {
             idleKey: "boomer_idle",
             blinkKey: "boomer_blink",
@@ -62,5 +61,5 @@ export const BONEHEAD_DB = {
             defence: 3
         },
         price: 3
-    },
+    }
 }

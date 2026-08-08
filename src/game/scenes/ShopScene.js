@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import { BONEHEAD_DB } from '../data/boneheadDB'
+import { BONEHEAD_COLOURS } from '../data/boneheadColours'
 import { BOOSTER_DB } from '../data/boosterDB'
 import { PAINT_DB } from '../data/paintDB'
 import { playerData } from '../state/playerData'
@@ -14,6 +15,7 @@ import { SHOP_LAYOUT } from '../ui/layout'
 import { Panel } from '../ui/Panel'
 
 import { centerText } from '../ui/utils/centerText'
+import { getRandomBoneheadColour } from '../helpers/getRandomBoneheadColour'
 
 import { Tooltip } from '../ui/Tooltip'
 import { UIButton } from '../ui/uiButton'
@@ -91,6 +93,7 @@ export default class ShopScene extends Phaser.Scene {
         boneheadSelections.forEach((id, index) => {
 
             const bonehead = BONEHEAD_DB[id]
+            const colour = getRandomBoneheadColour()
 
             const x = panel.x + boneheadLayout.offsetX + index * boneheadLayout.spacing
             const y = panel.y + boneheadLayout.offsetY
