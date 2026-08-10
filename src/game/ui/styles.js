@@ -17,6 +17,25 @@ export const UI_STYLES = {
         }
     },
 
+    buttonSmall: {
+        fontFamily: 'Luckiest Guy',
+        fontSize: '18px',
+        align: 'center',
+        color: '#ffffff',
+        backgroundColor: 0x223c66,
+        hoverBackgroundColor: 0x475569,
+        stroke: 0x154d1f,
+        strokeThickness: 3,
+        width: 75,
+        height: 40,
+        padding: {
+            left: 4,
+            right: 4,
+            top: 5,
+            bottom: 5
+        }
+    },
+
     buttonDanger: {
         fontFamily: 'Luckiest Guy',
         fontSize: '22px',

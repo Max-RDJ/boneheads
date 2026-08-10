@@ -7,7 +7,8 @@ import { playerData } from '../state/playerData'
 import { BoneheadCard } from '../ui/BoneheadCard'
 import { CoinCounter } from '../ui/CoinCounter'
 import { PaintCard } from '../ui/PaintCard'
-
+import { INVENTORY_LAYOUT } from '../ui/layout'
+import { Panel } from '../ui/Panel'
 import { Tooltip } from '../ui/Tooltip'
 import { UIButton } from '../ui/uiButton'
 import { UI_STYLES } from '../ui/styles'
@@ -36,7 +37,7 @@ export default class InventoryScene extends Phaser.Scene {
             UI_STYLES.title
         ).setOrigin(0.5)
 
-        this.showInventory()
+        this.createBoneheadSection()
         this.createPaintSection()
         this.createBackButton()
     }
@@ -44,18 +45,29 @@ export default class InventoryScene extends Phaser.Scene {
     createBackButton() {
         new UIButton(
             this,
-            600,
-            520,
+            70,
+            50,
             'Back',
-            UI_STYLES.button,
+            UI_STYLES.buttonSmall,
             () => {
                 this.scene.start('ShopScene')
             },
-            { backgroundColor: '#6a6a6a' }
         )
     }
 
     createPaintSection() {
+        const panel = INVENTORY_LAYOUT.panels.paint
+        
+        new Panel(
+            this,
+            panel.x,
+            panel.y,
+            panel.width,
+            panel.height,
+            {
+                title: 'Paint'
+            }
+        )
 
         const paints = playerData.paint.map(unit => {
 
@@ -101,12 +113,24 @@ export default class InventoryScene extends Phaser.Scene {
                 400,
                 400,
                 'How about bringing some colour into your life?',
-                UI_STYLES.bodySmall
+                UI_STYLES.bodyLarge
             ).setOrigin(0.5)
         }
     }
 
-    showInventory() {
+    createBoneheadSection() {
+        const panel = INVENTORY_LAYOUT.panels.boneheads
+        
+        new Panel(
+            this,
+            panel.x,
+            panel.y,
+            panel.width,
+            panel.height,
+            {
+                title: 'Boneheads'
+            }
+        )
 
         const boneheads = playerData.bag.contents.map(unit => {
 
@@ -151,7 +175,7 @@ export default class InventoryScene extends Phaser.Scene {
 
             this.add.text(
                 400,
-                300,
+                200,
                 "It's looking a little lonely in here...",
                 UI_STYLES.bodyLarge
             ).setOrigin(0.5)

@@ -43,3 +43,36 @@ export const SHOP_LAYOUT = {
         spacing: 100
     }
 }
+
+export const INVENTORY_LAYOUT = {
+    width: 800,
+    height: 600,
+
+    panels: {
+        boneheads: {
+            x: 30,
+            y: 110,
+            width: 750,
+            height: 200
+        },
+
+        paint: {
+            x: 30,
+            y: 360,
+            width: 750,
+            height: 150
+        }
+    },
+
+    boneheads: {
+        offsetX: 75,
+        offsetY: 100,
+        spacing: 110
+    },
+
+    paint: {
+        offsetX: 80,
+        offsetY: 100,
+        spacing: 100
+    }
+}
