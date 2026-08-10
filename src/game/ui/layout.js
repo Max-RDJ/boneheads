@@ -33,7 +33,7 @@ export const SHOP_LAYOUT = {
 
     boosters: {
         offsetX: 85,
-        offsetY: 150,
+        offsetY: 120,
         spacing: 140
     },
 

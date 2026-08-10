@@ -16,10 +16,21 @@ export class BoosterCard extends Phaser.GameObjects.Container {
 
         scene.add.existing(this)
 
-        this.createPriceText(booster)
         this.createImage(booster)
+        this.createPriceText(booster)
 
-        this.setSize(180, 120)
+        const priceGap = 10
+
+        this.priceText.y =
+            this.image.displayHeight / 2 +
+            priceGap +
+            this.priceText.height / 2
+
+        this.setSize(
+            180,
+            this.image.displayHeight + this.priceText.height + priceGap
+        )
+
         this.setInteractive(
             new Phaser.Geom.Rectangle(
                 -30,
@@ -69,11 +80,14 @@ export class BoosterCard extends Phaser.GameObjects.Container {
 
         this.image = this.scene.add.image(
             0,
-            -25,
+            0,
             booster.textures.key
         )
 
-        this.image.setScale(0.35)
+        const width = 80
+        const scale = width / this.image.width
+
+        this.image.setScale(scale)
 
         this.image.setInteractive({
             useHandCursor: true
@@ -90,7 +104,7 @@ export class BoosterCard extends Phaser.GameObjects.Container {
 
         this.priceText = this.scene.add.text(
             0,
-            70,
+            0,
             `¢${booster.price}`,
             UI_STYLES.bodySmall
         ).setOrigin(0.5)

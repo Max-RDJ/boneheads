@@ -4,7 +4,7 @@ export const BOOSTER_DB = {
         name: "Standard Pack",
         textures: {
             key: "standard_booster",
-            url: "/assets/standard_booster.png",
+            url: "/assets/boosters/standard_booster.png",
         },
         contentsCount: 5,
         description: "A standard booster pack containing 5 random Boneheads.",
@@ -15,19 +15,19 @@ export const BOOSTER_DB = {
         name: "Mega Pack",
         textures: {
             key: "mega_booster",
-            url: "/assets/standard_booster.png",
+            url: "/assets/boosters/standard_booster.png",
         },
         contentsCount: 5,
         price: 20
     },
     mystery: {
         id: "mystery",
-        name: "Mystery Pack",
+        name: "Mystery Box",
         textures: {
             key: "mystery_booster",
-            url: "/assets/standard_booster.png",
+            url: "/assets/boosters/mystery_booster.png",
         },
-        contentsCount: 5,
+        contentsCount: 1,
         price: 30
     },
 }

@@ -48,7 +48,7 @@ export default class PreloadScene extends Phaser.Scene {
 
         this.load.image(
             'bag',
-            '/assets/bag.png'
+            '/assets/ui/bag.png'
         )
 
     }
