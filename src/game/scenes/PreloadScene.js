@@ -11,17 +11,20 @@ export default class PreloadScene extends Phaser.Scene {
 
     preload() {
 
+        const colours = ['blue', 'green', 'red', 'magenta']
+
         Object.values(BONEHEAD_DB).forEach((bonehead) => {
+            colours.forEach((colour) => {
+                this.load.image(
+                    `${bonehead.id}_idle_${colour}`,
+                    `/assets/bonehead_entities/${bonehead.id}/${bonehead.id}_idle_${colour}.png`
+                )
 
-            this.load.image(
-            `${bonehead.id}_idle_${colour}`,
-            `/assets/${bonehead.id}_idle_${colour}.png`
-        )
-
-        this.load.image(
-            `${bonehead.id}_blink_${colour}`,
-            `/assets/${bonehead.id}_blink_${colour}.png`
-        )
+                this.load.image(
+                    `${bonehead.id}_blink_${colour}`,
+                    `/assets/bonehead_entities/${bonehead.id}/${bonehead.id}_blink_${colour}.png`
+                )
+            })
         })
 
         this.load.font(

@@ -1,3 +1,5 @@
+import { BONEHEAD_COLOURS } from "../data/boneheadColours"
+
 export function getRandomBoneheadColour() {
 
     const colours = Object.entries(BONEHEAD_COLOURS)

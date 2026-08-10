@@ -11,6 +11,13 @@ export const playerData = {
     ],
 
     paint: [
-    ]
+    ],
+
+    shop: {
+        boneheads: null,
+        boosters: null,
+        paints: null,
+        rerollCount: 0
+    }
 
 }
