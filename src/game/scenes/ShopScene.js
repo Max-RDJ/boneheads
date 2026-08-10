@@ -222,15 +222,35 @@ export default class ShopScene extends Phaser.Scene {
     }
 
     generateBoosterStock() {
-        const boosterIds = Phaser.Utils.Array.Shuffle(
-            Object.keys(BOOSTER_DB)
-        ).slice(0, 3)
+        const boosters = Object.entries(BOOSTER_DB)
 
-        return boosterIds.map(id => ({
-            ...BOOSTER_DB[id],
-            instanceId: generateInstanceId(),
-            sold: false
-        }))
+        const totalWeight = boosters.reduce(
+            (total, [, data]) => total + data.weight,
+            0
+        )
+
+        const stock = []
+
+        for (let i = 0; i < 3; i++) {
+            let random = Math.random() * totalWeight
+
+            for (const [id, data] of boosters) {
+
+                random -= data.weight
+
+                if (random <= 0) {
+                    stock.push({
+                        ...data,
+                        instanceId: generateInstanceId(),
+                        sold: false
+                    })
+
+                    break
+                }
+            }
+        }
+
+        return stock
     }
 
     buyBooster(booster) {

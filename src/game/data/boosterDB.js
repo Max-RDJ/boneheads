@@ -8,7 +8,8 @@ export const BOOSTER_DB = {
         },
         contentsCount: 5,
         description: "A standard booster pack containing 5 random Boneheads.",
-        price: 10
+        price: 10,
+        weight: 60
     },
     mega: {
         id: "mega",
@@ -18,7 +19,8 @@ export const BOOSTER_DB = {
             url: "/assets/boosters/standard_booster.png",
         },
         contentsCount: 5,
-        price: 20
+        price: 20,
+        weight: 30
     },
     mystery: {
         id: "mystery",
@@ -28,6 +30,7 @@ export const BOOSTER_DB = {
             url: "/assets/boosters/mystery_booster.png",
         },
         contentsCount: 1,
-        price: 30
+        price: 30,
+        weight: 10
     },
 }
