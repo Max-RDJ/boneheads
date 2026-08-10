@@ -89,12 +89,20 @@ export default class InventoryScene extends Phaser.Scene {
         if (paints.length > 0) {
 
             paints.forEach((paint, index) => {
+                const paintLayout = INVENTORY_LAYOUT.paint
 
                 const column = index % columns
                 const row = Math.floor(index / columns)
 
-                const x = startX + column * spacingX
-                const y = startY + row * spacingY
+                const x =
+                    panel.x +
+                    paintLayout.x +
+                    column * paintLayout.spacing
+
+                const y =
+                    panel.y +
+                    paintLayout.y +
+                    row * paintLayout.spacing
 
                 new PaintCard(
                     this,
@@ -111,7 +119,7 @@ export default class InventoryScene extends Phaser.Scene {
 
             this.add.text(
                 400,
-                400,
+                430,
                 'How about bringing some colour into your life?',
                 UI_STYLES.bodyLarge
             ).setOrigin(0.5)
@@ -119,7 +127,7 @@ export default class InventoryScene extends Phaser.Scene {
     }
 
     createBoneheadSection() {
-        const panel = INVENTORY_LAYOUT.panels.boneheads
+        const panel = INVENTORY_LAYOUT.panels.bag[playerData.bag.size]
         
         new Panel(
             this,
@@ -153,14 +161,22 @@ export default class InventoryScene extends Phaser.Scene {
         if (boneheads.length > 0) {
 
             boneheads.forEach((bonehead, index) => {
+                const boneheadLayout = INVENTORY_LAYOUT.boneheads
 
                 const column = index % columns
                 const row = Math.floor(index / columns)
 
-                const x = startX + column * spacingX
-                const y = startY + row * spacingY
+                const x =
+                    panel.x +
+                    boneheadLayout.x +
+                    column * boneheadLayout.spacing
 
-                new BoneheadCard(
+                const y =
+                    panel.y +
+                    boneheadLayout.y +
+                    row * boneheadLayout.spacing
+
+                const card = new BoneheadCard(
                     this,
                     x,
                     y,
@@ -169,16 +185,19 @@ export default class InventoryScene extends Phaser.Scene {
                     this.tooltip,
                     { showPrice: false }
                 )
+
+                card.boneheadId = bonehead.instanceId
             })
 
         } else {
 
             this.add.text(
                 400,
-                200,
+                180,
                 "It's looking a little lonely in here...",
                 UI_STYLES.bodyLarge
             ).setOrigin(0.5)
         }
     }
+
 }

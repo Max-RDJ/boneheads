@@ -49,30 +49,53 @@ export const INVENTORY_LAYOUT = {
     height: 600,
 
     panels: {
-        boneheads: {
-            x: 30,
-            y: 110,
-            width: 750,
-            height: 200
+        bag: {
+            small: {
+                x: 30,
+                y: 110,
+                width: 750,
+                height: 140
+            },
+
+            medium: {
+                x: 30,
+                y: 110,
+                width: 750,
+                height: 210
+            },
+
+            large: {
+                x: 30,
+                y: 110,
+                width: 750,
+                height: 320
+            },
+
+            xlarge: {
+                x: 30,
+                y: 110,
+                width: 750,
+                height: 430
+            }
         },
 
         paint: {
             x: 30,
             y: 360,
             width: 750,
-            height: 150
+            height: 140
         }
     },
 
     boneheads: {
-        offsetX: 75,
-        offsetY: 100,
+        x: 100,
+        y: 100,
         spacing: 110
     },
 
     paint: {
-        offsetX: 80,
-        offsetY: 100,
+        x: 100,
+        y: 100,
         spacing: 100
     }
 }
