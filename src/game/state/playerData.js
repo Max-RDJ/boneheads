@@ -1,14 +1,12 @@
+import { BAG_SIZES } from "../data/bagDB"
+
 export const playerData = {
     coins: 100,
 
-    bagType: [
-        { name: 'small', capacity: 10},
-        { name: 'medium', capacity: 20},
-        { name: 'large', capacity: 30}
-    ],
-
-    bag: [
-    ],
+    bag: {
+        size: 'small',
+        contents: []
+    },
 
     paint: [
     ],

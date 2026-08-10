@@ -136,7 +136,7 @@ export default class ShopScene extends Phaser.Scene {
 
         playerData.coins -= bonehead.price
 
-        playerData.bag.push({
+        playerData.bag.contents.push({
             instanceId: generateInstanceId(),
             typeId: bonehead.id,
             colour: bonehead.colour

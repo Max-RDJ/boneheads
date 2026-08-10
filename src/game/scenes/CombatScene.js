@@ -10,7 +10,7 @@ import { enemyParty } from '../state/enemyParty'
 
 
 function getPlayerUnits() {
-    return playerData.bag.map(id =>
+    return playerData.bag.contents.map(id =>
         playerData.bag.find(
             unit => unit.instanceId === id
         )

@@ -100,7 +100,7 @@ export default class InventoryScene extends Phaser.Scene {
             this.add.text(
                 400,
                 400,
-                'Paint will appear here once purchased',
+                'How about bringing some colour into your life?',
                 UI_STYLES.bodySmall
             ).setOrigin(0.5)
         }
@@ -108,7 +108,7 @@ export default class InventoryScene extends Phaser.Scene {
 
     showInventory() {
 
-        const boneheads = playerData.bag.map(unit => {
+        const boneheads = playerData.bag.contents.map(unit => {
 
             const bonehead = BONEHEAD_DB[unit.typeId]
 
@@ -152,7 +152,7 @@ export default class InventoryScene extends Phaser.Scene {
             this.add.text(
                 400,
                 300,
-                'Empty!',
+                "It's looking a little lonely in here...",
                 UI_STYLES.bodyLarge
             ).setOrigin(0.5)
         }
