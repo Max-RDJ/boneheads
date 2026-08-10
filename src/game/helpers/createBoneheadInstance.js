@@ -1,4 +1,5 @@
 import { BONEHEAD_COLOURS } from "../data/boneheadColours"
+import { BONEHEAD_DB } from "../data/boneheadDB"
 
 export function getRandomBoneheadColour() {
 
@@ -21,4 +22,14 @@ export function getRandomBoneheadColour() {
     }
 
     return 'blue'
+}
+
+export function createBoneheadInstance(id) {
+    const baseBonehead = BONEHEAD_DB[id]
+    const colour = getRandomBoneheadColour()
+
+    return {
+        ...baseBonehead,
+        colour
+    }
 }

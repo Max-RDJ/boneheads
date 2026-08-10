@@ -14,7 +14,8 @@ export class UIButton extends Phaser.GameObjects.Container {
             radius = 12,
             borderColor = 0x475569,
             borderWidth = 3,
-            backgroundColor = 0x1e293b,
+            backgroundColor = 0x329745,
+            hoverBackgroundColor = backgroundColor,
             ...textStyle
         } = {
             ...style,
@@ -22,6 +23,12 @@ export class UIButton extends Phaser.GameObjects.Container {
         }
 
         this.buttonWidth = width
+        this.buttonHeight = height
+        this.radius = radius
+        this.borderColor = borderColor
+        this.borderWidth = borderWidth
+        this.backgroundColor = backgroundColor
+        this.hoverBackgroundColor = hoverBackgroundColor
 
         this.text = scene.add.text(
             0,
@@ -34,24 +41,7 @@ export class UIButton extends Phaser.GameObjects.Container {
 
         this.background = scene.add.graphics()
 
-        this.background.fillStyle(backgroundColor)
-        this.background.lineStyle(borderWidth, borderColor)
-
-        this.background.fillRoundedRect(
-            -width / 2,
-            -buttonHeight / 2,
-            width,
-            buttonHeight,
-            radius
-        )
-
-        this.background.strokeRoundedRect(
-            -width / 2,
-            -buttonHeight / 2,
-            width,
-            buttonHeight,
-            radius
-        )
+        this.drawBackground(this.backgroundColor, buttonHeight)
 
         this.add([
             this.background,
@@ -67,12 +57,39 @@ export class UIButton extends Phaser.GameObjects.Container {
         this.on('pointerdown', onClick)
 
         this.on('pointerover', () => {
-            this.setScale(1.05)
+            this.drawBackground(this.hoverBackgroundColor, buttonHeight)
         })
 
         this.on('pointerout', () => {
-            this.setScale(1)
+            this.drawBackground(this.backgroundColor, buttonHeight)
         })
+    }
+
+    drawBackground(color, height) {
+
+        this.background.clear()
+
+        this.background.fillStyle(color)
+        this.background.lineStyle(
+            this.borderWidth,
+            this.borderColor
+        )
+
+        this.background.fillRoundedRect(
+            -this.buttonWidth / 2,
+            -height / 2,
+            this.buttonWidth,
+            height,
+            this.radius
+        )
+
+        this.background.strokeRoundedRect(
+            -this.buttonWidth / 2,
+            -height / 2,
+            this.buttonWidth,
+            height,
+            this.radius
+        )
     }
 
     setText(text) {

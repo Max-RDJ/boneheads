@@ -15,7 +15,8 @@ import { SHOP_LAYOUT } from '../ui/layout'
 import { Panel } from '../ui/Panel'
 
 import { centerText } from '../ui/utils/centerText'
-import { getRandomBoneheadColour } from '../helpers/getRandomBoneheadColour'
+import { createBoneheadInstance } from '../helpers/createBoneheadInstance'
+import { generateInstanceId } from '../helpers/generateInstanceId'
 
 import { Tooltip } from '../ui/Tooltip'
 import { UIButton } from '../ui/uiButton'
@@ -59,15 +60,7 @@ export default class ShopScene extends Phaser.Scene {
         this.createRerollButton()
     }
 
-    generateInstanceId() {
-        return (
-            Date.now().toString() +
-            Math.random().toString(36).slice(2)
-        )
-    }
-
     createBoneheadMarket() {
-
         const panel = SHOP_LAYOUT.panels.market
 
         new Panel(
@@ -85,6 +78,10 @@ export default class ShopScene extends Phaser.Scene {
             playerData.shop.boneheads = this.generateBoneheadStock()
         }
 
+        this.createBoneheadCards(panel)
+    }
+
+    createBoneheadCards(panel) {
         const boneheadLayout = SHOP_LAYOUT.boneheads
 
         this.boneheadCards = []
@@ -121,30 +118,15 @@ export default class ShopScene extends Phaser.Scene {
     }
 
     generateBoneheadStock() {
-        const boneheadIds = Phaser.Utils.Array.Shuffle(
+        const ids = Phaser.Utils.Array.Shuffle(
             Object.keys(BONEHEAD_DB)
-        ).slice(0, 4)
+        ).slice(0, 5)
 
-        return boneheadIds.map(id => {
-
-            const bonehead = this.createBoneheadInstance(id)
-
-            return {
-                ...bonehead,
-                instanceId: this.generateInstanceId(),
-                sold: false
-            }
-        })
-    }
-
-    createBoneheadInstance(id) {
-        const baseBonehead = BONEHEAD_DB[id]
-        const colour = getRandomBoneheadColour()
-
-        return {
-            ...baseBonehead,
-            colour
-        }
+        return ids.map(id => ({
+            ...createBoneheadInstance(id),
+            instanceId: generateInstanceId(),
+            sold: false
+        }))
     }
 
     buyBonehead(bonehead) {
@@ -155,7 +137,7 @@ export default class ShopScene extends Phaser.Scene {
         playerData.coins -= bonehead.price
 
         playerData.bag.push({
-            instanceId: this.generateInstanceId(),
+            instanceId: generateInstanceId(),
             typeId: bonehead.id,
             colour: bonehead.colour
         })
@@ -201,18 +183,14 @@ export default class ShopScene extends Phaser.Scene {
         )
 
         if (!playerData.shop.boosters) {
-            const boosterIds = Object.keys(BOOSTER_DB)
-
-            playerData.shop.boosters = Phaser.Utils.Array.Shuffle(
-                [...boosterIds]
-            ).slice(0, 3)
+            playerData.shop.boosters = this.generateBoosterStock()
         }
 
         const boosterLayout = SHOP_LAYOUT.boosters
 
-        playerData.shop.boosters.forEach((id, index) => {
+        this.boosterCards = []
 
-            const booster = BOOSTER_DB[id]
+        playerData.shop.boosters.forEach((booster, index) => {
 
             const x =
                 panel.x +
@@ -223,7 +201,12 @@ export default class ShopScene extends Phaser.Scene {
                 panel.y +
                 boosterLayout.offsetY
 
-            new BoosterCard(
+            if (booster.sold) {
+                this.createSoldText(x, y)
+                return
+            }
+
+            const card = new BoosterCard(
                 this,
                 x,
                 y,
@@ -231,6 +214,10 @@ export default class ShopScene extends Phaser.Scene {
                 this.buyBooster.bind(this),
                 this.tooltip
             )
+
+            card.boosterId = booster.instanceId
+
+            this.boosterCards.push(card)
         })
     }
 
@@ -241,7 +228,7 @@ export default class ShopScene extends Phaser.Scene {
 
         return boosterIds.map(id => ({
             ...BOOSTER_DB[id],
-            instanceId: this.generateInstanceId(),
+            instanceId: generateInstanceId(),
             sold: false
         }))
     }
@@ -253,12 +240,27 @@ export default class ShopScene extends Phaser.Scene {
 
         playerData.coins -= booster.price
 
-        const stockItem = playerData.shop.boosters.find(
-            item => item.typeId === booster.id && !item.sold
+        const shopBooster = playerData.shop.boosters.find(
+            item => item.instanceId === booster.instanceId
         )
 
-        if (stockItem) {
-            stockItem.sold = true
+        if (shopBooster) {
+            shopBooster.sold = true
+        }
+
+        const card = this.boosterCards.find(
+            card => card.boosterId === booster.instanceId
+        )
+
+        if (card) {
+            this.tooltip.hide()
+
+            const x = card.x
+            const y = card.y
+
+            card.destroy()
+
+            this.createSoldText(x, y)
         }
 
         this.refreshCoins()
@@ -332,7 +334,7 @@ export default class ShopScene extends Phaser.Scene {
 
         return paintIds.map(id => ({
             ...PAINT_DB[id],
-            instanceId: this.generateInstanceId(),
+            instanceId: generateInstanceId(),
             sold: false
         }))
     }
@@ -345,7 +347,7 @@ export default class ShopScene extends Phaser.Scene {
         playerData.coins -= paint.price
 
         playerData.paint.push({
-            instanceId: this.generateInstanceId(),
+            instanceId: generateInstanceId(),
             typeId: paint.id,
             colour: paint.colour
         })
@@ -389,7 +391,7 @@ export default class ShopScene extends Phaser.Scene {
     }
 
     createStartBattleButton() {
-        new UIButton(this, 650, 150, 'Next Round', UI_STYLES.button, () => {
+        new UIButton(this, 650, 150, 'Next Round', UI_STYLES.buttonDanger, () => {
             console.log(playerData.activeParty)
             if (playerData.activeParty.length === 0) {
                 alert('You must have at least one Bonehead in your active party to start a battle!')
@@ -398,7 +400,6 @@ export default class ShopScene extends Phaser.Scene {
             this.scene.start('CombatScene')
         },
         {
-            backgroundColor: '0xaa2222',
             width: 200
         })
     }
@@ -424,9 +425,8 @@ export default class ShopScene extends Phaser.Scene {
                 this.boneheadCards.forEach(card => card.destroy())
 
                 playerData.shop.boneheads = this.generateBoneheadStock()
-                this.boneheadCards.forEach(card => card.destroy())
-                this.createBoneheadMarket()
 
+                this.createBoneheadMarket()
                 this.updateRerollButtonText()
                 this.refreshCoins()
 
@@ -436,7 +436,6 @@ export default class ShopScene extends Phaser.Scene {
             {
                 width: 200,
                 height: 75,
-                backgroundColor: 0x154d1f
             }
         )
     }

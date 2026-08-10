@@ -7,10 +7,12 @@ import { playerData } from '../state/playerData'
 import { BoneheadCard } from '../ui/BoneheadCard'
 import { CoinCounter } from '../ui/CoinCounter'
 import { Panel } from '../ui/Panel'
-
 import { SHOP_LAYOUT } from '../ui/layout'
 import { Tooltip } from '../ui/Tooltip'
 import { UI_STYLES } from '../ui/styles'
+
+import { createBoneheadInstance } from '../helpers/createBoneheadInstance'
+import { generateInstanceId } from '../helpers/generateInstanceId'
 
 
 export default class BoosterScene extends Phaser.Scene {
@@ -90,7 +92,6 @@ export default class BoosterScene extends Phaser.Scene {
     }
 
     getRandomBoneheads(amount) {
-
         const ids = Object.keys(BONEHEAD_DB)
 
         const shuffled = Phaser.Utils.Array.Shuffle(
@@ -99,24 +100,18 @@ export default class BoosterScene extends Phaser.Scene {
 
         return shuffled
             .slice(0, Math.min(amount, ids.length))
-            .map(id => BONEHEAD_DB[id])
+            .map(id => createBoneheadInstance(id))
     }
 
     selectBonehead(bonehead) {
 
-        playerData.collection.push({
-            instanceId: this.generateInstanceId(),
-            typeId: bonehead.id
+        playerData.bag.push({
+            instanceId: bonehead.generateInstanceId,
+            typeId: bonehead.id,
+            colour: bonehead.colour
         })
 
         this.scene.start('ShopScene')
     }
 
-    generateInstanceId() {
-
-        return (
-            Date.now().toString() +
-            Math.random().toString(36).slice(2)
-        )
-    }
 }

@@ -5,8 +5,9 @@ export const UI_STYLES = {
         fontSize: '22px',
         align: 'center',
         color: '#ffffff',
-        backgroundColor: '#2f9e44',
-        stroke: '#154d1f',
+        backgroundColor: 0x39ac4e,
+        hoverBackgroundColor:0x268337,
+        stroke: 0x154d1f,
         strokeThickness: 3,
         padding: {
             left: 16,
@@ -20,8 +21,9 @@ export const UI_STYLES = {
         fontFamily: 'Luckiest Guy',
         fontSize: '22px',
         color: '#ffffff',
-        backgroundColor: '#d63333',
-        stroke: '#6e1111',
+        backgroundColor: 0xb62c2c,
+        hoverBackgroundColor:0x6a1a1a,
+        stroke: 0x6e1111,
         strokeThickness: 3,
         padding: {
             left: 16,
