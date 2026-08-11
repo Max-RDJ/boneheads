@@ -133,13 +133,13 @@ export default class ShopScene extends Phaser.Scene {
     }
 
     buyBonehead(bonehead) {
-        if (checkBagFull()) {
-            this.boneheadPanel.errorOverlay.showMessage('Bag full!')
+        if (playerData.coins < bonehead.price) {
+            this.boneheadPanel.errorOverlay.showMessage('You broke, pal?')
             return
         }
 
-        if (playerData.coins < bonehead.price) {
-            this.boneheadPanel.errorOverlay.showMessage('You broke, pal?')
+        if (checkBagFull()) {
+            this.boneheadPanel.errorOverlay.showMessage('Bag full!')
             return
         }
 
@@ -431,7 +431,7 @@ export default class ShopScene extends Phaser.Scene {
             UI_STYLES.bodySmall
         ).setOrigin(0.5)
 
-        panel.add(soldText)
+        panel.addContent(soldText)
 
         return soldText
     }
