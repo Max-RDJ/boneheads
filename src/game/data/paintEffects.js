@@ -1,5 +1,6 @@
 export const PAINT_EFFECTS = {
     red: {
-        accuracyMultiplier: 2
+        accuracyMultiplier: 2,
+        roundsRemaining: 3
     },
 }

@@ -19,16 +19,8 @@ export function getBoneheadStats(bonehead) {
         stats.accuracy *= paintEffect.accuracyMultiplier
     }
 
-    if (paintEffect.defenceMultiplier) {
-        stats.defence *= paintEffect.defenceMultiplier
-    }
-
-    if (paintEffect.accuracyBonus) {
-        stats.accuracy += paintEffect.accuracyBonus
-    }
-
-    if (paintEffect.defenceBonus) {
-        stats.defence += paintEffect.defenceBonus
+    if (paintEffect.roundsRemaining) {
+        stats.roundsRemaining = paintEffect.roundsRemaining
     }
 
     return stats
