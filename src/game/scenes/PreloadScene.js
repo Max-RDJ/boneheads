@@ -47,6 +47,21 @@ export default class PreloadScene extends Phaser.Scene {
         })
 
         this.load.image(
+            'paint_brush_red',
+            '/assets/ui/paint_brush_red.png'
+        )
+
+        this.load.image(
+            'paint_brush_blue',
+            '/assets/ui/paint_brush_blue.png'
+        )
+
+        this.load.image(
+            'paint_brush_green',
+            '/assets/ui/paint_brush_green.png'
+        )
+
+        this.load.image(
             'bag',
             '/assets/ui/bag.png'
         )

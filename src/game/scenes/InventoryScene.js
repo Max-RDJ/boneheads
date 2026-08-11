@@ -12,6 +12,7 @@ import { Panel } from '../ui/Panel'
 import { Tooltip } from '../ui/Tooltip'
 import { UIButton } from '../ui/uiButton'
 import { UI_STYLES } from '../ui/styles'
+import { PaintModeIndicator } from '../ui/PaintModeIndicator'
 
 
 export default class InventoryScene extends Phaser.Scene {
@@ -40,6 +41,15 @@ export default class InventoryScene extends Phaser.Scene {
         this.createBoneheadSection()
         this.createPaintSection()
         this.createBackButton()
+
+        this.paintMode = false
+        this.selectedPaint = null
+
+        this.input.on('pointerdown', this.handlePointerDown, this)
+
+        this.game.canvas.addEventListener('contextmenu', (event) => {
+        event.preventDefault()
+    })
     }
 
     createBackButton() {
@@ -109,7 +119,7 @@ export default class InventoryScene extends Phaser.Scene {
                     x,
                     y,
                     paint,
-                    null,
+                    this.selectPaint.bind(this),
                     this.tooltip,
                     { showPrice: false }
                 )
@@ -124,6 +134,13 @@ export default class InventoryScene extends Phaser.Scene {
                 UI_STYLES.bodyLarge
             ).setOrigin(0.5)
         }
+    }
+
+    selectPaint(paint) {
+        this.paintMode = true
+        this.selectedPaint = paint
+
+        this.enterPaintMode()
     }
 
     createBoneheadSection() {
@@ -181,7 +198,7 @@ export default class InventoryScene extends Phaser.Scene {
                     x,
                     y,
                     bonehead,
-                    null,
+                    this.handleBoneheadClick.bind(this),
                     this.tooltip,
                     { showPrice: false }
                 )
@@ -200,4 +217,76 @@ export default class InventoryScene extends Phaser.Scene {
         }
     }
 
+    
+    // Painting
+    handleBoneheadClick(bonehead) {
+        if (!this.paintMode) {
+            return
+        }
+
+        this.paintBonehead(
+            bonehead,
+            this.selectedPaint
+        )
+    }
+
+    paintBonehead(bonehead, paint) {
+        const ownedBonehead = playerData.bag.contents.find(
+            item => item.instanceId === bonehead.instanceId
+        )
+
+        if (ownedBonehead) {
+            ownedBonehead.colour = paint.colour
+        }
+
+        const paintIndex = playerData.paint.findIndex(
+            item => item.instanceId === paint.instanceId
+        )
+
+        if (paintIndex !== -1) {
+            playerData.paint.splice(paintIndex, 1)
+        }
+
+        this.exitPaintMode()
+        this.refreshInventory()
+    }
+
+    enterPaintMode() {
+        const paint = this.selectPaint
+
+        if (!this.paintModeIndicator) {
+            this.paintModeIndicator = new PaintModeIndicator(
+                this,
+                'paintBrush',
+                paint.colour
+            )
+        } else {
+            this.paintModeIndicator.setColour(paint.colour)
+        }
+
+        this.paintModeIndicator.show()
+        this.game.canvas.style.cursor = 'none'
+    }
+
+    exitPaintMode() {
+
+        this.paintMode = false
+        this.selectedPaint = null
+
+        this.paintModeIndicator.hide()
+        this.game.canvas.style.cursor = 'default'
+    }
+
+    handlePointerDown(pointer) {
+        if (pointer.rightButtonDown() && this.paintMode) {
+            this.exitPaintMode()
+        }
+    }
+
+    refreshInventory() {
+        this.children.removeAll(true)
+
+        this.createBoneheadSection()
+        this.createPaintSection()
+    }
 }
