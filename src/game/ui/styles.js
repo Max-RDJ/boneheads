@@ -96,5 +96,10 @@ export const UI_STYLES = {
             top: 10,
             bottom: 10
         },
+    },
+
+    errorOverlay: {
+        backgroundColor: 0x000000,
+        alpha: 0.5,
     }
 }

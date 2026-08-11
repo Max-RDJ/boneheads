@@ -19,3 +19,7 @@ export const playerData = {
     }
 
 }
+
+export function checkBagFull() {
+    return playerData.bag.contents.length >= BAG_SIZES[playerData.bag.size].capacity
+}

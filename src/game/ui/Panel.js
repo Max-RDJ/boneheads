@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import { ErrorOverlay } from './ErrorOverlay'
 
 export class Panel extends Phaser.GameObjects.Container {
 
@@ -20,9 +21,9 @@ export class Panel extends Phaser.GameObjects.Container {
             border = 0x475569,
             borderWidth = 5,
             radius = 12,
-            title = null
+            title = null,
+            errorOverlay = false
         } = options
-
 
         this.background = scene.add.graphics()
 
@@ -48,15 +49,44 @@ export class Panel extends Phaser.GameObjects.Container {
         this.add(this.background)
 
 
+        this.content = scene.add.container(0, 0)
+
+        this.add(this.content)
+
+
+        if (errorOverlay) {
+            this.errorOverlay = new ErrorOverlay(
+                scene,
+                0,
+                0,
+                width,
+                height
+            )
+
+            this.add(this.errorOverlay)
+        }
+
+
         if (title) {
-            this.createTitle(scene, title, border, fill)
+            this.createTitle(
+                scene,
+                title,
+                border,
+                fill
+            )
         }
 
         this.setSize(width, height)
     }
 
 
+    addContent(child) {
+        this.content.add(child)
+    }
+
+
     createTitle(scene, title, border, fill) {
+
         this.titleText = scene.add.text(
             35,
             -12,
@@ -71,9 +101,11 @@ export class Panel extends Phaser.GameObjects.Container {
         const paddingX = 15
         const paddingY = 8
 
-        const titleWidth = this.titleText.width + paddingX * 2
-        const titleHeight = this.titleText.height + paddingY * 2
+        const titleWidth =
+            this.titleText.width + paddingX * 2
 
+        const titleHeight =
+            this.titleText.height + paddingY * 2
 
         this.titleBackground = scene.add.graphics()
 
@@ -96,7 +128,7 @@ export class Panel extends Phaser.GameObjects.Container {
             10
         )
 
-        this.addAt(this.titleBackground, 1)
+        this.add(this.titleBackground)
         this.add(this.titleText)
     }
 }

@@ -13,6 +13,8 @@ import { BoosterScene } from './BoosterScene'
 import { CoinCounter } from '../ui/CoinCounter'
 import { SHOP_LAYOUT } from '../ui/layout'
 import { Panel } from '../ui/Panel'
+import { checkBagFull } from '../state/playerData'
+import { ErrorOverlay } from '../ui/ErrorOverlay'
 
 import { centerText } from '../ui/utils/centerText'
 import { createBoneheadInstance } from '../helpers/createBoneheadInstance'
@@ -61,16 +63,17 @@ export default class ShopScene extends Phaser.Scene {
     }
 
     createBoneheadMarket() {
-        const panel = SHOP_LAYOUT.panels.market
+        const panelLayout = SHOP_LAYOUT.panels.market
 
-        new Panel(
+        this.boneheadPanel = new Panel(
             this,
-            panel.x,
-            panel.y,
-            panel.width,
-            panel.height,
+            panelLayout.x,
+            panelLayout.y,
+            panelLayout.width,
+            panelLayout.height,
             {
-                title: 'Singles'
+                title: 'Singles',
+                errorOverlay: true
             }
         )
 
@@ -78,7 +81,7 @@ export default class ShopScene extends Phaser.Scene {
             playerData.shop.boneheads = this.generateBoneheadStock()
         }
 
-        this.createBoneheadCards(panel)
+        this.createBoneheadCards(this.boneheadPanel)
     }
 
     createBoneheadCards(panel) {
@@ -89,16 +92,14 @@ export default class ShopScene extends Phaser.Scene {
         playerData.shop.boneheads.forEach((bonehead, index) => {
 
             const x =
-                panel.x +
                 boneheadLayout.offsetX +
                 index * boneheadLayout.spacing
 
             const y =
-                panel.y +
                 boneheadLayout.offsetY
 
             if (bonehead.sold) {
-                this.createSoldText(x, y)
+                this.createSoldText(panel, x, y)
                 return
             }
 
@@ -114,6 +115,8 @@ export default class ShopScene extends Phaser.Scene {
             card.boneheadId = bonehead.instanceId
 
             this.boneheadCards.push(card)
+
+            this.boneheadPanel.addContent(card)
         })
     }
 
@@ -130,7 +133,13 @@ export default class ShopScene extends Phaser.Scene {
     }
 
     buyBonehead(bonehead) {
+        if (checkBagFull()) {
+            this.boneheadPanel.errorOverlay.showMessage('Bag full!')
+            return
+        }
+
         if (playerData.coins < bonehead.price) {
+            this.boneheadPanel.errorOverlay.showMessage('You broke, pal?')
             return
         }
 
@@ -162,23 +171,24 @@ export default class ShopScene extends Phaser.Scene {
 
             card.destroy()
 
-            this.createSoldText(x, y)
+            this.createSoldText(this.boneheadPanel, x, y)
         }
 
         this.refreshCoins()
     }
 
     createBoosterMarket() {
-        const panel = SHOP_LAYOUT.panels.boosters
+        const panelLayout = SHOP_LAYOUT.panels.boosters
 
-        new Panel(
+        this.boosterPanel = new Panel(
             this,
-            panel.x,
-            panel.y,
-            panel.width,
-            panel.height,
+            panelLayout.x,
+            panelLayout.y,
+            panelLayout.width,
+            panelLayout.height,
             {
-                title: 'Booster Packs'
+                title: 'Booster Packs',
+                errorOverlay: true
             }
         )
 
@@ -193,16 +203,18 @@ export default class ShopScene extends Phaser.Scene {
         playerData.shop.boosters.forEach((booster, index) => {
 
             const x =
-                panel.x +
                 boosterLayout.offsetX +
                 index * boosterLayout.spacing
 
             const y =
-                panel.y +
                 boosterLayout.offsetY
 
             if (booster.sold) {
-                this.createSoldText(x, y)
+                this.createSoldText(
+                    this.boosterPanel,
+                    x,
+                    y
+                )
                 return
             }
 
@@ -218,6 +230,8 @@ export default class ShopScene extends Phaser.Scene {
             card.boosterId = booster.instanceId
 
             this.boosterCards.push(card)
+
+            this.boosterPanel.addContent(card)
         })
     }
 
@@ -255,6 +269,7 @@ export default class ShopScene extends Phaser.Scene {
 
     buyBooster(booster) {
         if (playerData.coins < booster.price) {
+            this.boosterPanel.errorOverlay.showMessage('You broke, pal?')
             return
         }
 
@@ -280,7 +295,7 @@ export default class ShopScene extends Phaser.Scene {
 
             card.destroy()
 
-            this.createSoldText(x, y)
+            this.createSoldText(this.boosterPanel, x, y)
         }
 
         this.refreshCoins()
@@ -291,16 +306,17 @@ export default class ShopScene extends Phaser.Scene {
     }
 
     createPaintMarket() {
-        const panel = SHOP_LAYOUT.panels.paint
+        const panelLayout = SHOP_LAYOUT.panels.paint
 
-        new Panel(
+        this.paintPanel = new Panel(
             this,
-            panel.x,
-            panel.y,
-            panel.width,
-            panel.height,
+            panelLayout.x,
+            panelLayout.y,
+            panelLayout.width,
+            panelLayout.height,
             {
-                title: 'Paint'
+                title: 'Paint',
+                errorOverlay: true
             }
         )
 
@@ -318,17 +334,19 @@ export default class ShopScene extends Phaser.Scene {
             const row = Math.floor(index / 2)
 
             const x =
-                panel.x +
                 paintLayout.offsetX +
                 column * paintLayout.spacing
 
             const y =
-                panel.y +
                 paintLayout.offsetY +
                 row * paintLayout.spacing
 
             if (paint.sold) {
-                this.createSoldText(x, y)
+                this.createSoldText(
+                    this.paintPanel,
+                    x,
+                    y
+                )
                 return
             }
 
@@ -344,6 +362,8 @@ export default class ShopScene extends Phaser.Scene {
             card.paintId = paint.instanceId
 
             this.paintCards.push(card)
+
+            this.paintPanel.addContent(card)
         })
     }
 
@@ -361,6 +381,7 @@ export default class ShopScene extends Phaser.Scene {
 
     buyPaint(paint) {
         if (playerData.coins < paint.price) {
+            this.paintPanel.errorOverlay.showMessage('You broke, pal?')
             return
         }
 
@@ -391,7 +412,8 @@ export default class ShopScene extends Phaser.Scene {
             const y = card.y
 
             card.destroy()
-            this.createSoldText(x, y)
+
+            this.createSoldText(this.paintPanel, x, y)
         }
 
         this.refreshCoins()
@@ -401,13 +423,17 @@ export default class ShopScene extends Phaser.Scene {
         this.coinCounter.setAmount(playerData.coins)
     }
 
-    createSoldText(x, y) {
-        this.add.text(
+    createSoldText(panel, x, y) {
+        const soldText = this.add.text(
             x,
             y - 20,
             'SOLD!',
             UI_STYLES.bodySmall
         ).setOrigin(0.5)
+
+        panel.add(soldText)
+
+        return soldText
     }
 
     createStartBattleButton() {
