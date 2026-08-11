@@ -13,6 +13,7 @@ import { Tooltip } from '../ui/Tooltip'
 import { UIButton } from '../ui/uiButton'
 import { UI_STYLES } from '../ui/styles'
 import { PaintModeIndicator } from '../ui/PaintModeIndicator'
+import { getBoneheadStats } from '../helpers/getBoneheadStats'
 
 
 export default class InventoryScene extends Phaser.Scene {
@@ -53,7 +54,7 @@ export default class InventoryScene extends Phaser.Scene {
     }
 
     createBackButton() {
-        new UIButton(
+        this.backButton = new UIButton(
             this,
             70,
             50,
@@ -160,11 +161,13 @@ export default class InventoryScene extends Phaser.Scene {
         const boneheads = playerData.bag.contents.map(unit => {
 
             const bonehead = BONEHEAD_DB[unit.typeId]
+            const stats = getBoneheadStats(unit)
 
             return {
                 ...bonehead,
                 instanceId: unit.instanceId,
-                colour: unit.colour
+                colour: unit.colour,
+                stats: getBoneheadStats(unit)
             }
         })
 
@@ -235,9 +238,11 @@ export default class InventoryScene extends Phaser.Scene {
             item => item.instanceId === bonehead.instanceId
         )
 
-        if (ownedBonehead) {
-            ownedBonehead.colour = paint.colour
+        if (!ownedBonehead) {
+            return
         }
+
+        ownedBonehead.colour = paint.colour
 
         const paintIndex = playerData.paint.findIndex(
             item => item.instanceId === paint.instanceId
@@ -251,13 +256,15 @@ export default class InventoryScene extends Phaser.Scene {
         this.refreshInventory()
     }
 
+
     enterPaintMode() {
-        const paint = this.selectPaint
+        this.backButton.disableInteractive()
+
+        const paint = this.selectedPaint
 
         if (!this.paintModeIndicator) {
             this.paintModeIndicator = new PaintModeIndicator(
                 this,
-                'paintBrush',
                 paint.colour
             )
         } else {
@@ -265,7 +272,7 @@ export default class InventoryScene extends Phaser.Scene {
         }
 
         this.paintModeIndicator.show()
-        this.game.canvas.style.cursor = 'none'
+        this.input.setDefaultCursor('none')
     }
 
     exitPaintMode() {
@@ -273,8 +280,9 @@ export default class InventoryScene extends Phaser.Scene {
         this.paintMode = false
         this.selectedPaint = null
 
+        this.backButton.setInteractive()
         this.paintModeIndicator.hide()
-        this.game.canvas.style.cursor = 'default'
+        this.input.setDefaultCursor('default')
     }
 
     handlePointerDown(pointer) {
@@ -285,8 +293,6 @@ export default class InventoryScene extends Phaser.Scene {
 
     refreshInventory() {
         this.children.removeAll(true)
-
-        this.createBoneheadSection()
-        this.createPaintSection()
+        this.create()
     }
 }

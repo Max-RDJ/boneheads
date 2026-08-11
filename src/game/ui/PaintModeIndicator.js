@@ -2,7 +2,7 @@ import Phaser from 'phaser'
 
 export class PaintModeIndicator extends Phaser.GameObjects.Container {
 
-    constructor(scene, texture, colour) {
+    constructor(scene, colour) {
         super(scene)
 
         scene.add.existing(this)
@@ -10,10 +10,10 @@ export class PaintModeIndicator extends Phaser.GameObjects.Container {
         this.brush = scene.add.image(
             0,
             0,
-            texture
+            `paint_brush_${colour}`
         )
 
-        this.brush.setScale(0.6)
+        this.brush.setScale(0.2)
 
         this.add(this.brush)
 
@@ -25,13 +25,13 @@ export class PaintModeIndicator extends Phaser.GameObjects.Container {
 
     updatePosition(pointer) {
         this.setPosition(
-            pointer.worldX + 12,
-            pointer.worldY + 12
+            pointer.x + 36,
+            pointer.y + -28
         )
     }
 
     setColour(colour) {
-        this.brush.setTexture(`paint_brush_${colour}.png`)
+        this.brush.setTexture(`paint_brush_${colour}`)
     }
 
     show() {
