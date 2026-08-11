@@ -9,8 +9,8 @@ export const BONEHEAD_DB = {
             blinkUrl: "/assets/julius_blink.png"
         },
         stats: {
-            accuracy: 5,
-            defence: 5,
+            attack: 10,
+            hp: 10,
         },
         price: 10
     },
@@ -25,8 +25,8 @@ export const BONEHEAD_DB = {
             blinkUrl: "/assets/beefhead_blink.png"
         },
         stats: {
-            accuracy: 4,
-            defence: 6,
+            attack: 4,
+            hp: 10,
         },
         price: 2
     },
@@ -35,14 +35,14 @@ export const BONEHEAD_DB = {
         id: "ploder",
         name: "Ploder",
         textures: {
-            idleKey: "boomer_idle",
-            blinkKey: "boomer_blink",
-            idleUrl: "/assets/boomer_idle.png",
-            blinkUrl: "/assets/boomer_blink.png"
+            idleKey: "ploder_idle",
+            blinkKey: "ploder_blink",
+            idleUrl: "/assets/ploder_idle.png",
+            blinkUrl: "/assets/ploder_blink.png"
         },
         stats: {
-            accuracy: 6,
-            defence: 3,
+            attack: 6,
+            hp: 3,
         },
         price: 3
     },
@@ -57,8 +57,8 @@ export const BONEHEAD_DB = {
             blinkUrl: "/assets/boomer_blink.png"
         },
         stats: {
-            accuracy: 6,
-            defence: 3,
+            attack: 6,
+            hp: 8,
         },
         price: 3
     }

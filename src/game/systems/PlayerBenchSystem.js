@@ -1,6 +1,8 @@
-import BenchBase from './BenchBase'
 import { BONEHEAD_DB } from '../data/boneheadDB'
 import { DEPTH } from '../config/depth'
+import { playerData } from '../state/playerData'
+import { startSpriteBlinking } from '../helpers/startSpriteBlinking'
+
 
 const SLOT_SPACING = 100
 const PLAYER_Y = 500
@@ -12,228 +14,219 @@ const BATTLE_ZONE = {
     height: 220
 }
 
-const BATTLE_X = 400
-const BATTLE_Y = 380
+const MAX_DEPLOYED = 3
 
-export default class PlayerBenchSystem extends BenchBase {
+export default class PlayerBenchSystem {
 
     constructor(scene) {
-        super(scene)
-        this.activeUnit = null
-    }
-
-    create(party) {
+        this.scene = scene
         this.slots = []
         this.slotPositions = []
-        const SLOT_COUNT = party.length;
-        const totalWidth = (party.length - 1) * SLOT_SPACING
-        const startX = (800 - totalWidth) / 2
+        this.battleUnits = []
+    }
 
-        for (let i = 0; i < SLOT_COUNT; i++) {
-            this.slots[i] = null;
+    create() {
+        this.sprites = []
+        this.slots = []
+        this.slotPositions = []
+        this.battleUnits = []
 
+        const playerBoneheads = playerData.bag.contents
+
+        const slotCount = playerBoneheads.length
+
+        const totalWidth =
+            (slotCount - 1) * SLOT_SPACING
+
+        const startX =
+            (800 - totalWidth) / 2
+
+        for (let i = 0; i < slotCount; i++) {
             this.slotPositions[i] = {
                 x: startX + i * SLOT_SPACING,
                 y: PLAYER_Y
-            };
+            }
+
+            this.slots[i] = null
         }
 
-        party.forEach((unit, i) => {
-            const data = BONEHEAD_DB[unit.typeId]
-            const pos = this.slotPositions[i];
+        playerBoneheads.forEach((unit, index) => {
+            this.createBonehead(unit, index, startX)
+        })
+    }
 
-            const sprite = this.scene.add.image(
-                pos.x,
-                pos.y,
-                data.textures.idleKey
-            )
+    createBonehead(unit, index) {
+        const data = BONEHEAD_DB[unit.typeId]
+        const position = this.slotPositions[index]
 
-            sprite.slotIndex = i;
-            this.slots[i] = sprite;
+        const textureKey =
+            `${unit.typeId}_idle_${unit.colour}`
 
-            sprite.setDisplaySize(64, 64)
+        const sprite = this.scene.add.image(
+            position.x,
+            position.y,
+            textureKey
+        )
 
-            sprite.unit = unit
-            sprite.setInteractive({ cursor: 'pointer' })
-            this.scene.input.setDraggable(sprite)
+        sprite.unit = unit
+        sprite.slotIndex = index
+        sprite.location = 'bench'
+        sprite.isDead = false
 
-            sprite.on('dragstart', () => {
-                if (this.activeUnit === sprite) {
-                    return
-                }
+        sprite.setDisplaySize(64, 64)
+        sprite.setInteractive({ cursor: 'pointer' })
 
-                this.scene.showBattleZoneHighlight(
-                    !this.activeUnit
-                )
+        this.scene.input.setDraggable(sprite)
 
-                sprite.setDepth(DEPTH.dragging)
-            })
+        this.slots[index] = sprite
+        this.sprites.push(sprite)
 
-            sprite.on('drag', (p, x, y) => {
-                if (this.activeUnit === sprite) {
-                    return
-                }
+        this.setupDragging(sprite)
 
-                sprite.x = x
-                sprite.y = y
+        startSpriteBlinking(this.scene, sprite)
+    }
 
-                const insideBattle =
-                    this.isInBattleZone(sprite)
+    setupDragging(sprite) {
 
-                if (insideBattle) {
-                    const canDrop =
-                        !this.activeUnit ||
-                        this.activeUnit === sprite
+        sprite.on('dragstart', () => {
 
-                    this.scene.showBattleZoneHighlight(
-                        canDrop
-                    )
-                } else {
-                    this.scene.hideBattleZoneHighlight()
-                }
-            })
+            if (sprite.isDead) {
+                return
+            }
 
-            sprite.on('dragend', () => {
+            const canDeploy =
+                sprite.location === 'battle' ||
+                this.battleUnits.length < MAX_DEPLOYED
+
+            this.scene.showBattleZoneHighlight(canDeploy)
+
+            sprite.setDepth(DEPTH.dragging)
+        })
+
+        sprite.on('drag', (pointer, x, y) => {
+
+            if (sprite.isDead) {
+                return
+            }
+
+            sprite.x = x
+            sprite.y = y
+
+            const inside =
+                this.isInBattleZone(sprite)
+
+            if (!inside) {
                 this.scene.hideBattleZoneHighlight()
-                
-                if (this.activeUnit === sprite) {
-                    this.moveToBattle(sprite)
-                    return
-                }
+                return
+            }
 
-                sprite.setDepth(DEPTH.player)
+            const alreadyDeployed =
+                sprite.location === 'battle'
 
-                const slotIndex = this.getNearestSlot(sprite.x, sprite.y);
-                const insideBattle = this.isInBattleZone(sprite);
+            const canDeploy =
+                alreadyDeployed ||
+                this.battleUnits.length < MAX_DEPLOYED
 
-                if (insideBattle) {
-                    const currentFighter = this.activeUnit
+            this.scene.showBattleZoneHighlight(canDeploy)
+        })
 
-                    if (currentFighter && currentFighter !== sprite) {
-                        this.snapToSlot(sprite, sprite.slotIndex)
-                        return
-                    }
+        sprite.on('dragend', () => {
 
-                    this.moveToBattle(sprite)
+            this.scene.hideBattleZoneHighlight()
 
-                    this.scene.turnSystem.setPlayerFighter(sprite)
+            if (sprite.isDead) {
+                return
+            }
 
-                    if (!this.scene.turnSystem.enemyFighter) {
-                        const enemyFighter =
-                            this.scene.enemyBench.selectRandomFighter()
+            sprite.setDepth(DEPTH.player)
 
-                        this.scene.turnSystem.setEnemyFighter(enemyFighter)
-                    }
+            const inside =
+                this.isInBattleZone(sprite)
 
-                    this.slots[sprite.slotIndex] = null
-
-                    return
-                }
-
-                if (slotIndex !== -1) {
-                    this.snapToSlot(sprite, slotIndex);
-                } else {
-                    this.snapToSlot(sprite, sprite.slotIndex);
-                }
-            });
-
-            this.startBlinking(sprite, data)
-            this.sprites.push(sprite)
+            if (inside) {
+                this.deploy(sprite)
+            } else {
+                this.returnToBench(sprite)
+            }
         })
     }
 
     isInBattleZone(sprite) {
         return (
-            sprite.x > BATTLE_ZONE.x - BATTLE_ZONE.width / 2 &&
-            sprite.x < BATTLE_ZONE.x + BATTLE_ZONE.width / 2 &&
-            sprite.y > BATTLE_ZONE.y - BATTLE_ZONE.height / 2 &&
-            sprite.y < BATTLE_ZONE.y + BATTLE_ZONE.height / 2
-        );
+            sprite.x >
+                BATTLE_ZONE.x - BATTLE_ZONE.width / 2 &&
+            sprite.x <
+                BATTLE_ZONE.x + BATTLE_ZONE.width / 2 &&
+            sprite.y >
+                BATTLE_ZONE.y - BATTLE_ZONE.height / 2 &&
+            sprite.y <
+                BATTLE_ZONE.y + BATTLE_ZONE.height / 2
+        )
     }
 
-    getNearestSlot(x, y) {
-        let bestIndex = -1;
-        let bestDist = Infinity;
+    deploy(sprite) {
 
-        this.slotPositions.forEach((pos, i) => {
-            const dx = x - pos.x;
-            const dy = y - pos.y;
-            const dist = dx * dx + dy * dy;
-
-            if (dist < bestDist) {
-                bestDist = dist;
-                bestIndex = i;
-            }
-        });
-
-        return bestIndex;
-    }
-
-    snapToSlot(sprite, targetIndex) {
-        const currentIndex = sprite.slotIndex;
-        const occupying = this.slots[targetIndex];
-
-        if (occupying && occupying !== sprite) {
-            this.slots[currentIndex] = occupying;
-
-            this.scene.tweens.add({
-                targets: occupying,
-                x: this.slotPositions[currentIndex].x,
-                y: PLAYER_Y,
-                duration: 200
-            });
-
-            occupying.slotIndex = currentIndex;
-        } else {
-            this.slots[currentIndex] = null;
-        }
-
-        this.slots[targetIndex] = sprite;
-        sprite.slotIndex = targetIndex;
-
-        this.scene.tweens.add({
-            targets: sprite,
-            x: this.slotPositions[targetIndex].x,
-            y: PLAYER_Y,
-            duration: 200
-        });
-    }
-
-    moveToBattle(sprite) {
-        this.scene.tweens.add({
-            targets: sprite,
-            x: BATTLE_X,
-            y: BATTLE_Y,
-            duration: 250,
-            ease: 'Power2'
-        })
-
-        this.activeUnit = sprite
-    }
-
-    returnToBench(sprite) {
-        this.scene.tweens.add({
-            targets: sprite,
-            x: this.slotPositions[sprite.slotIndex].x,
-            y: PLAYER_Y,
-            duration: 250,
-            ease: 'Power2'
-        });
-    }
-
-    getActiveUnits() {
-        return this.sprites.filter(sprite => !sprite.isDead)
-    }
-
-    returnActiveToBench() {
-        if (!this.activeUnit) {
+        if (sprite.location === 'battle') {
+            this.moveToBattle(sprite)
             return
         }
 
-        const sprite = this.activeUnit
+        if (this.battleUnits.length >= MAX_DEPLOYED) {
+            this.returnToBench(sprite)
+            return
+        }
 
-        this.slots[sprite.slotIndex] = sprite
-        this.returnToBench(sprite)
-        this.activeUnit = null
+        this.battleUnits.push(sprite)
+
+        sprite.location = 'battle'
+
+        this.moveToBattle(sprite)
+
+        this.scene.turnSystem.onPlayerDeploy(sprite)
+    }
+
+    moveToBattle(sprite) {
+
+        this.scene.tweens.add({
+            targets: sprite,
+            x: BATTLE_ZONE.x,
+            y: BATTLE_ZONE.y,
+            duration: 250,
+            ease: 'Power2'
+        })
+    }
+
+    returnToBench(sprite) {
+
+        const index = this.battleUnits.indexOf(sprite)
+
+        if (index !== -1) {
+            this.battleUnits.splice(index, 1)
+        }
+
+        sprite.location = 'bench'
+
+        const position =
+            this.slotPositions[sprite.slotIndex]
+
+        this.scene.tweens.add({
+            targets: sprite,
+            x: position.x,
+            y: position.y,
+            duration: 250,
+            ease: 'Power2'
+        })
+    }
+
+    getBattleUnits() {
+        return this.battleUnits.filter(
+            sprite => !sprite.isDead
+        )
+    }
+
+    getLivingUnits() {
+        return this.sprites.filter(
+            sprite => !sprite.isDead
+        )
     }
 }

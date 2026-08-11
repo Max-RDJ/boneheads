@@ -5,8 +5,8 @@ export function getBoneheadStats(bonehead) {
     const baseStats = BONEHEAD_DB[bonehead.typeId].stats
 
     const stats = {
-        accuracy: baseStats.accuracy,
-        defence: baseStats.defence
+        attack: baseStats.attack,
+        hp: baseStats.hp
     }
 
     const paintEffect = PAINT_EFFECTS[bonehead.colour]
@@ -15,8 +15,8 @@ export function getBoneheadStats(bonehead) {
         return stats
     }
 
-    if (paintEffect.accuracyMultiplier) {
-        stats.accuracy *= paintEffect.accuracyMultiplier
+    if (paintEffect.attackMultiplier) {
+        stats.attack *= paintEffect.attackMultiplier
     }
 
     if (paintEffect.roundsRemaining) {

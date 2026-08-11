@@ -7,7 +7,7 @@ export const PAINT_DB = {
             key: "paint_red",
             url: "/assets/paint/paint_red.png",
         },
-        description: "Double Bonehead accuracy; Bonehead is destroyed after 3 rounds.",
+        description: "Double Bonehead's attack; Bonehead is destroyed after 3 rounds.",
         price: 10,
         sizes: ["10ml", "30ml", "50ml"]
     },

@@ -2,6 +2,8 @@ import Phaser from 'phaser'
 
 import { COLOURS } from './ColourMap'
 import { UI_STYLES } from './styles'
+import { startSpriteBlinking } from '../helpers/startSpriteBlinking'
+
 
 export class BoneheadCard extends Phaser.GameObjects.Container {
 
@@ -44,7 +46,7 @@ export class BoneheadCard extends Phaser.GameObjects.Container {
             this.tooltip.show(
                 pointer,
                 this.bonehead.name,
-                `Accuracy: ${this.bonehead.stats.accuracy}\nDefence: ${this.bonehead.stats.defence}`,
+                `Attack: ${this.bonehead.stats.attack}\nhp: ${this.bonehead.stats.hp}`,
                 COLOURS[this.bonehead.colour]
             )
 

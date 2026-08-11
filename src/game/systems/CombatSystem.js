@@ -1,75 +1,67 @@
-import { BONEHEAD_DB } from '../data/boneheadDB'
+import { getBoneheadStats } from '../helpers/getBoneheadStats'
 
 export default class CombatSystem {
+
     constructor(scene) {
         this.scene = scene
+        this.selectedAttacker = null
     }
 
-    getHitChance(attackerStats, defenderStats, defenderGuarding) {
-        const acc = attackerStats.accuracy
-        let defence = defenderStats.defence
-
-        if (defenderGuarding) {
-            defence *= 2
+    selectAttacker(sprite) {
+        if (!sprite || sprite.isDead) {
+            return false
         }
 
-        let chance = acc / (acc + defence)
+        if (sprite.location !== 'battle') {
+            return false
+        }
 
-        const variance =
-            (Math.random() - 0.5) * 0.2
+        if (sprite.deployedTurn === this.scene.turnSystem.turn) {
+            return false
+        }
 
-        chance += variance
+        this.selectedAttacker = sprite
 
-        return Math.min(
-            0.95,
-            Math.max(0.05, chance)
+        console.log(
+            'Selected attacker:',
+            sprite.unit.typeId
         )
+
+        return true
     }
 
-    attack(attackerSprite, defenderSprite, defenderGuarding = false) {
-        if (!attackerSprite || !defenderSprite) {
-            console.warn('Missing sprites')
+    attack(attacker, defender) {
+
+        if (!attacker || !defender) {
             return false
         }
 
-        if (!attackerSprite.unit || !defenderSprite.unit) {
-            console.warn('Missing unit data:', attackerSprite, defenderSprite)
+        if (attacker.isDead || defender.isDead) {
             return false
         }
 
-        const attackerData =
-            BONEHEAD_DB[attackerSprite.unit.typeId]
+        const attackerStats =
+            getBoneheadStats(attacker.unit)
 
-        const defenderData =
-            BONEHEAD_DB[defenderSprite.unit.typeId]
+        const damage = attackerStats.accuracy
 
-        if (!attackerData || !defenderData) {
-            console.warn('Missing bonehead DB data')
-            return false
-        }
+        defender.unit.hp -= damage
 
-        const chance = this.getHitChance(
-            attackerData.stats,
-            defenderData.stats,
-            defenderGuarding
+        console.log(
+            `${attacker.unit.typeId} attacks ${defender.unit.typeId}`
         )
 
         console.log(
-            `${attackerData.name} attacks ${defenderData.name}`,
-            `(${Math.round(chance * 100)}% hit chance)`
+            `${defender.unit.typeId} HP: ${defender.unit.hp}`
         )
 
-        const hit = Math.random() < chance
-
-        if (hit) {
-            console.log('HIT')
-            this.defeat(defenderSprite)
-            return true
+        if (defender.unit.hp <= 0) {
+            this.defeat(defender)
         }
 
-        console.log('MISS')
+        this.selectedAttacker = null
 
-        return false
+        return true
     }
 
     defeat(sprite) {

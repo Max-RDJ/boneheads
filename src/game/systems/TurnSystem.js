@@ -1,207 +1,111 @@
-import CombatSystem from './CombatSystem'
-
-
 export default class TurnSystem {
-    constructor(scene) {
-        this.scene = scene
-        this.combat = new CombatSystem(scene)
 
-        this.playerFighter = null
-        this.playerBench = []
-        this.enemyFighter = null
-        this.enemyBench = []
+    constructor(scene, combatSystem) {
+
+        this.scene = scene
+        this.combat = combatSystem
+
+        this.turn = 1
+
+        this.playerDeployedThisTurn = []
+        this.playerActionsThisTurn = []
 
         this.isResolving = false
-        this.playerAction = null
     }
 
-    setPlayerFighter(sprite) {
-        this.playerFighter = sprite
-    }
+    onPlayerDeploy(sprite) {
 
-    setPlayerBench(units) {
-        this.playerBench = units
-    }
-
-    setEnemyFighter(sprite) {
-        this.enemyFighter = sprite
-    }
-
-    setEnemyBench(units) {
-        this.enemyBench = units
-    }
-
-    takeTurn(action) {
-        if (!this.playerFighter) return
-        if (this.isResolving) return
-        if (!this.enemyFighter) return
-
-        this.playerAction = action
-        this.isResolving = true
-
-        this.resolveCombat()
-    }
-
-    async resolveStep() {
-        if (!this.enemyFighter || this.enemyFighter.isDead) return
-        if (!this.playerFighter || this.playerFighter.isDead) return
-        
-        /* const playerHit = this.combat.attack(
-            this.playerFighter,
-            this.enemyFighter
-        ) */
-
-        await this.delay(500)
-
-        if (this.checkWin()) return
-
-        if (this.enemyFighter.isDead) {
-            this.enemyFighter = this.selectNextEnemyFighter()
-        }
-
-        if (!this.enemyFighter.isDead) {
-            const target = this.pickPlayerTarget()
-
-            this.combat.attack(
-                this.enemyFighter,
-                target
-            )
-
-            await this.delay(500)
+        if (!this.playerDeployedThisTurn.includes(sprite)) {
+            this.playerDeployedThisTurn.push(sprite)
         }
     }
 
-    async resolveCombat() {
-        const player = this.playerFighter
-        const enemy = this.enemyFighter
+    canAct(sprite) {
 
-        if (!player || !enemy) {
-            this.resetTurn()
+        if (!sprite || sprite.isDead) {
+            return false
+        }
+
+        return true
+    }
+
+    attack(attacker, defender) {
+
+        if (this.isResolving) {
             return
         }
 
-        const playerIsGuarding = this.playerAction === 'guard'
-
-        if (this.playerAction === 'attack') {
-            this.combat.attack(player, enemy, false)
-        }
-
-        this.clearDeadPlayerFighter()
-
-        if (this.checkWin() || this.checkLoss()) {
-            this.resetTurn()
+        if (!this.canAct(attacker)) {
             return
         }
 
-        if (playerIsGuarding) {
-            player.isGuarding = true
+        if (!defender || defender.isDead) {
+            return
         }
-
-        await this.delay(500)
-
-        if (enemy.isDead) {
-            this.enemyFighter = this.selectNextEnemyFighter()
-
-            if (!this.enemyFighter) {
-                console.log("PLAYER WINS")
-                this.resetTurn()
-                return
-            }
-
-            await this.delay(500)
-        }
-
-        const defenderGuarding = player.isGuarding === true
-
-        const currentEnemy = this.enemyFighter
 
         this.combat.attack(
-            currentEnemy,
-            player,
-            defenderGuarding
+            attacker,
+            defender
         )
-        
-        this.clearDeadPlayerFighter()
 
-        if (this.checkWin() || this.checkLoss()) {
-            this.resetTurn()
+        this.playerActionsThisTurn.push({
+            type: 'attack',
+            attacker,
+            defender
+        })
+    }
+
+    guard(sprite) {
+
+        if (!this.canAct(sprite)) {
             return
         }
 
-        await this.delay(500)
+        sprite.isGuarding = true
 
-        const survivedGuard =
-            playerIsGuarding &&
-            !player.isDead
-
-        if (survivedGuard) {
-            this.scene.playerBench.returnActiveToBench()
-            this.playerFighter = null
-        }
-
-        player.isGuarding = false
-
-        this.resetTurn()
-    }
-
-    pickPlayerTarget() {
-        return this.playerFighter
-    }
-
-    resetTurn() {
-        this.playerAction = null
-        this.isResolving = false
-
-        if (this.playerFighter) {
-            this.playerFighter.isGuarding = false
-        }
-    }
-
-    checkWin() {
-        const allDead = (this.enemyBench || []).every(e => e.isDead)
-
-        if (allDead) {
-            console.log("PLAYER WINS")
-            return true
-        }
-
-        return false
-    }
-
-    checkLoss() {
-        const bench = this.playerBench || []
-
-        const allDead =
-            bench.length > 0 &&
-            bench.every(p => p.isDead)
-
-        console.log('Checking loss condition:', allDead)
-
-        if (allDead) {
-            console.log("ENEMY WINS")
-            return true
-        }
-
-        return false
-    }
-
-    clearDeadPlayerFighter() {
-        if (
-            this.playerFighter &&
-            this.playerFighter.isDead
-        ) {
-            this.scene.playerBench.activeUnit = null
-            this.playerFighter = null
-        }
-    }
-
-    selectNextEnemyFighter() {
-        return this.scene.enemyBench.selectRandomFighter()
-    }
-
-    delay(ms) {
-        return new Promise(resolve => {
-            this.scene.time.delayedCall(ms, resolve)
+        this.playerActionsThisTurn.push({
+            type: 'guard',
+            sprite
         })
+    }
+
+    endTurn() {
+
+        this.turn++
+
+        this.playerDeployedThisTurn = []
+        this.playerActionsThisTurn = []
+
+        this.resetGuards()
+        this.cleanupDeadUnits()
+    }
+
+    resetGuards() {
+
+        const units =
+            this.scene.playerBench.getLivingUnits()
+
+        units.forEach(unit => {
+            unit.isGuarding = false
+        })
+    }
+
+    cleanupDeadUnits() {
+
+        const playerUnits =
+            this.scene.playerBench.getLivingUnits()
+
+        const enemyUnits =
+            this.scene.enemyBench.getLivingUnits()
+
+        console.log(
+            'Player alive:',
+            playerUnits.length
+        )
+
+        console.log(
+            'Enemy alive:',
+            enemyUnits.length
+        )
     }
 }

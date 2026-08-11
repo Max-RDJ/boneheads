@@ -15,6 +15,7 @@ import { SHOP_LAYOUT } from '../ui/layout'
 import { Panel } from '../ui/Panel'
 import { checkBagFull } from '../state/playerData'
 import { ErrorOverlay } from '../ui/ErrorOverlay'
+import { startSpriteBlinking } from '../helpers/startSpriteBlinking'
 
 import { centerText } from '../ui/utils/centerText'
 import { createBoneheadInstance } from '../helpers/createBoneheadInstance'
@@ -111,6 +112,13 @@ export default class ShopScene extends Phaser.Scene {
                 this.buyBonehead.bind(this),
                 this.tooltip
             )
+
+            card.image.unit = {
+                id: bonehead.id,
+                colour: bonehead.colour
+            }
+
+            startSpriteBlinking(this, card.image)
 
             card.boneheadId = bonehead.instanceId
 
@@ -438,8 +446,7 @@ export default class ShopScene extends Phaser.Scene {
 
     createStartBattleButton() {
         new UIButton(this, 650, 150, 'Next Round', UI_STYLES.buttonDanger, () => {
-            console.log(playerData.activeParty)
-            if (playerData.activeParty.length === 0) {
+            if (playerData.bag.contents.length === 0) {
                 alert('You must have at least one Bonehead in your active party to start a battle!')
                 return
             }

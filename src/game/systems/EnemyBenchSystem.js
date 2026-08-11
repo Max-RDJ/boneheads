@@ -1,97 +1,182 @@
-import BenchBase from './BenchBase'
-import { BONEHEAD_DB } from '../data/boneheadDB'
 import Phaser from 'phaser'
+
+import { BONEHEAD_DB } from '../data/boneheadDB'
+import { BONEHEAD_COLOURS } from '../data/boneheadColours'
+import { startSpriteBlinking } from '../helpers/startSpriteBlinking'
+
 
 const SLOT_SPACING = 100
 const ENEMY_Y = 120
-const ENEMY_BATTLE_X = 400
-const ENEMY_BATTLE_Y = 220
 
-export default class EnemyBenchSystem extends BenchBase {
+const BATTLE_X = 400
+const BATTLE_Y = 220
+
+export default class EnemyBenchSystem {
 
     constructor(scene) {
-        super(scene)
+        this.scene = scene
         this.slots = []
         this.slotPositions = []
+        this.battleUnits = []
+        this.sprites = []
     }
 
-    create(party) {
-        const count = party.length
-        const totalWidth = (count - 1) * SLOT_SPACING
-        const startX = (800 - totalWidth) / 2
+    create(count = 3) {
+        this.sprites = []
+        this.slots = []
+        this.slotPositions = []
+        this.battleUnits = []
 
-        for (let i = 0; i < count; i++) {
-            this.slots[i] = null
+        const enemyBoneheads = this.generateEnemies(count)
 
+        const slotCount = enemyBoneheads.length
+
+        const totalWidth =
+            (slotCount - 1) * SLOT_SPACING
+
+        const startX =
+            (800 - totalWidth) / 2
+
+        for (let i = 0; i < slotCount; i++) {
             this.slotPositions[i] = {
                 x: startX + i * SLOT_SPACING,
                 y: ENEMY_Y
             }
+
+            this.slots[i] = null
         }
 
-        let availableSlots = [...Array(count).keys()]
-
-        party.forEach((unit, i) => {
-            const data = BONEHEAD_DB[unit.typeId]
-            const randomIndex = Phaser.Utils.Array.GetRandom(availableSlots)
-
-            Phaser.Utils.Array.Remove(availableSlots, randomIndex)
-
-            const pos = this.slotPositions[randomIndex]
-
-            const sprite = this.scene.add.image(
-                startX,
-                -100,
-                data.textures.idleKey
-            )
-
-            sprite.unit = unit
-            sprite.setDisplaySize(64, 64)
-
-            this.scene.tweens.add({
-                targets: sprite,
-                x: pos.x,
-                y: pos.y,
-                delay: i * 200,
-                duration: 500,
-                ease: 'Power2'
-            })
-
-            this.slots[randomIndex] = sprite
-            this.sprites.push(sprite)
-
-            this.startBlinking(sprite, data)
+        enemyBoneheads.forEach((unit, index) => {
+            this.createBonehead(unit, index)
         })
     }
 
-    getActiveUnits() {
-        return this.sprites.filter(s => !s.isDead)
+    generateEnemies(count) {
+        const types = Object.keys(BONEHEAD_DB)
+
+        return Array.from({ length: count }, (_, index) => {
+
+            const typeId =
+                Phaser.Utils.Array.GetRandom(types)
+
+            const colour =
+                this.getRandomColour()
+
+            return {
+                instanceId: `enemy_${index}`,
+                typeId,
+                colour
+            }
+        })
     }
 
-    selectRandomFighter() {
-        const alive = this.sprites.filter(s => !s.isDead)
+    getRandomColour() {
+        const colours = Object.entries(BONEHEAD_COLOURS)
 
-        if (!alive.length) {
-            return null
+        const totalWeight = colours.reduce(
+            (total, [, data]) => total + data.weight,
+            0
+        )
+
+        let random = Math.random() * totalWeight
+
+        for (const [colour, data] of colours) {
+            random -= data.weight
+
+            if (random <= 0) {
+                return colour
+            }
         }
 
-        const fighter =
-            Phaser.Utils.Array.GetRandom(alive)
-
-        this.moveToBattle(fighter)
-
-        return fighter
+        return colours[0][0]
     }
 
-    moveToBattle(sprite) {
+    createBonehead(unit, index) {
+        
+        const position =
+            this.slotPositions[index]
+
+        const textureKey =
+            `${unit.typeId}_idle_${unit.colour}`
+
+        const sprite = this.scene.add.image(
+            position.x,
+            position.y,
+            textureKey
+        )
+
+        sprite.unit = unit
+        sprite.slotIndex = index
+        sprite.location = 'bench'
+        sprite.isDead = false
+
+        sprite.setDisplaySize(64, 64)
+        sprite.setInteractive({
+            cursor: 'pointer'
+        })
+
+        sprite.on('pointerdown', () => {
+            const attacker =
+                this.scene.combatSystem.selectedAttacker
+
+            if (!attacker) {
+                return
+            }
+
+            this.scene.combatSystem.attack(
+                attacker,
+                sprite
+            )
+        })
+
+        this.slots[index] = sprite
+        this.sprites.push(sprite)
+
+        startSpriteBlinking(this.scene, sprite)
+    }
+
+    getLivingUnits() {
+        return this.sprites.filter(
+            sprite => !sprite.isDead
+        )
+    }
+
+    deployRandomUnits(count = 3) {
+        const available =
+            Phaser.Utils.Array.Shuffle(
+                this.getLivingUnits()
+            )
+
+        const selected =
+            available.slice(0, count)
+
+        selected.forEach(sprite => {
+            this.deploy(sprite)
+        })
+
+        return selected
+    }
+
+    deploy(sprite) {
+        if (sprite.location === 'battle') {
+            return
+        }
+
+        this.battleUnits.push(sprite)
+        sprite.location = 'battle'
+
         this.scene.tweens.add({
             targets: sprite,
-            x: ENEMY_BATTLE_X,
-            y: ENEMY_BATTLE_Y,
+            x: BATTLE_X,
+            y: BATTLE_Y,
             duration: 300,
             ease: 'Power2'
         })
+    }
 
-        this.activeUnit = sprite
+    getBattleUnits() {
+        return this.battleUnits.filter(
+            sprite => !sprite.isDead
+        )
     }
 }

@@ -1,32 +1,10 @@
 import Phaser from 'phaser'
 
-import ArenaSystem from '../systems/ArenaSystem'
 import PlayerBenchSystem from '../systems/PlayerBenchSystem'
 import EnemyBenchSystem from '../systems/EnemyBenchSystem'
+import CombatSystem from '../systems/CombatSystem'
 import TurnSystem from '../systems/TurnSystem'
-
-import { playerData } from '../state/playerData'
-import { enemyParty } from '../state/enemyParty'
-
-
-function getPlayerUnits() {
-    return playerData.bag.contents.map(id =>
-        playerData.bag.find(
-            unit => unit.instanceId === id
-        )
-    )
-}
-
-function getEnemyUnits() {
-    return enemyParty.bag.map(id =>
-        enemyParty.bag.find(
-            unit => unit.instanceId === id
-        )
-    )
-}
-const playerUnits = getPlayerUnits()
-const enemyUnits = getEnemyUnits()
-
+import ArenaSystem from '../systems/ArenaSystem'
 
 export default class CombatScene extends Phaser.Scene {
 
@@ -34,60 +12,29 @@ export default class CombatScene extends Phaser.Scene {
         super('CombatScene')
     }
 
-    preload() {
+    create() {
+
+        // Systems
+        this.arena = new ArenaSystem(this)
         this.playerBench = new PlayerBenchSystem(this)
         this.enemyBench = new EnemyBenchSystem(this)
+        this.combatSystem = new CombatSystem(this)
+        this.turnSystem = new TurnSystem(this)
 
-    this.playerBench.preload(playerUnits)
-        this.enemyBench.preload(enemyParty)
-    }
-
-    create() {
-        this.arena = new ArenaSystem(this)
+        // Arena
         this.arena.create()
 
         this.createBattleZoneIndicator()
 
-        this.turnSystem = new TurnSystem(this)
+        // Benches
+        this.playerBench.create()
+        this.enemyBench.create(3)
 
-        this.playerBench = new PlayerBenchSystem(this)
-        this.enemyBench = new EnemyBenchSystem(this)
+        // UI
+        this.createActionButtons()
+    }
 
-        this.playerBench.preload(playerUnits)
-        this.turnSystem.setPlayerBench(
-            this.playerBench.getPlayerUnits()
-        )
-
-        this.enemyBench.create(enemyParty)
-        this.turnSystem.setEnemyBench(
-            this.enemyBench.getEnemyUnits()
-        )
-
-        this.playerAction = null
-        this.playerGuarding = false
-
-        this.attackButton = this.add.text(
-            660,
-            230,
-            'ATTACK',
-            {
-                fontSize: '30px',
-                fontFamily: 'Arial',
-                backgroundColor: '#aa2222',
-                padding: {
-                    left: 16,
-                    right: 16,
-                    top: 8,
-                    bottom: 8
-                }
-            }
-        )
-
-        this.attackButton.setInteractive({ cursor: 'pointer' })
-
-        this.attackButton.on('pointerdown', () => {
-            this.turnSystem.takeTurn('attack')
-        })
+    createActionButtons() {
 
         this.guardButton = this.add.text(
             660,
@@ -106,10 +53,12 @@ export default class CombatScene extends Phaser.Scene {
             }
         )
 
-        this.guardButton.setInteractive({ cursor: 'pointer' })
+        this.guardButton.setInteractive({
+            cursor: 'pointer'
+        })
 
         this.guardButton.on('pointerdown', () => {
-            this.turnSystem.takeTurn('guard')
+            this.turnSystem.selectAction('guard')
         })
     }
 
@@ -146,11 +95,11 @@ export default class CombatScene extends Phaser.Scene {
         )
 
         this.battleZoneLabel.setOrigin(0.5)
-
         this.battleZoneLabel.setAlpha(0.25)
     }
 
     showBattleZoneHighlight(valid = true) {
+
         const color = valid
             ? 0x66ff66
             : 0xff6666
