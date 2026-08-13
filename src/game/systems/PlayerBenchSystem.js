@@ -2,6 +2,7 @@ import { BONEHEAD_DB } from '../data/boneheadDB'
 import { DEPTH } from '../config/depth'
 import { playerData } from '../state/playerData'
 import { startSpriteBlinking } from '../helpers/startSpriteBlinking'
+import { showBattleZoneHighlight, hideBattleZoneHighlight } from './ArenaSystem'
 
 
 const SLOT_SPACING = 100
@@ -87,7 +88,6 @@ export default class PlayerBenchSystem {
     }
 
     setupDragging(sprite) {
-
         sprite.on('dragstart', () => {
 
             if (sprite.isDead) {
@@ -98,7 +98,7 @@ export default class PlayerBenchSystem {
                 sprite.location === 'battle' ||
                 this.battleUnits.length < MAX_DEPLOYED
 
-            this.scene.showBattleZoneHighlight(canDeploy)
+            this.scene.arena.showBattleZoneHighlight(canDeploy)
 
             sprite.setDepth(DEPTH.dragging)
         })
@@ -116,7 +116,7 @@ export default class PlayerBenchSystem {
                 this.isInBattleZone(sprite)
 
             if (!inside) {
-                this.scene.hideBattleZoneHighlight()
+                this.scene.arena.hideBattleZoneHighlight()
                 return
             }
 
@@ -127,12 +127,12 @@ export default class PlayerBenchSystem {
                 alreadyDeployed ||
                 this.battleUnits.length < MAX_DEPLOYED
 
-            this.scene.showBattleZoneHighlight(canDeploy)
+            this.scene.arena.showBattleZoneHighlight(canDeploy)
         })
 
         sprite.on('dragend', () => {
 
-            this.scene.hideBattleZoneHighlight()
+            this.scene.arena.hideBattleZoneHighlight()
 
             if (sprite.isDead) {
                 return
@@ -152,16 +152,7 @@ export default class PlayerBenchSystem {
     }
 
     isInBattleZone(sprite) {
-        return (
-            sprite.x >
-                BATTLE_ZONE.x - BATTLE_ZONE.width / 2 &&
-            sprite.x <
-                BATTLE_ZONE.x + BATTLE_ZONE.width / 2 &&
-            sprite.y >
-                BATTLE_ZONE.y - BATTLE_ZONE.height / 2 &&
-            sprite.y <
-                BATTLE_ZONE.y + BATTLE_ZONE.height / 2
-        )
+        return this.scene.arena.isInBattleZone(sprite)
     }
 
     deploy(sprite) {
@@ -186,11 +177,13 @@ export default class PlayerBenchSystem {
     }
 
     moveToBattle(sprite) {
+        const position =
+            this.scene.arena.getBattlePosition()
 
         this.scene.tweens.add({
             targets: sprite,
-            x: BATTLE_ZONE.x,
-            y: BATTLE_ZONE.y,
+            x: position.x,
+            y: position.y,
             duration: 250,
             ease: 'Power2'
         })

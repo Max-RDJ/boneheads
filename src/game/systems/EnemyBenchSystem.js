@@ -6,7 +6,7 @@ import { startSpriteBlinking } from '../helpers/startSpriteBlinking'
 
 
 const SLOT_SPACING = 100
-const ENEMY_Y = 120
+const ENEMY_Y = 100
 
 const BATTLE_X = 400
 const BATTLE_Y = 220

@@ -5,6 +5,7 @@ import EnemyBenchSystem from '../systems/EnemyBenchSystem'
 import CombatSystem from '../systems/CombatSystem'
 import TurnSystem from '../systems/TurnSystem'
 import ArenaSystem from '../systems/ArenaSystem'
+import { Panel } from '../ui/Panel' 
 
 export default class CombatScene extends Phaser.Scene {
 
@@ -23,8 +24,6 @@ export default class CombatScene extends Phaser.Scene {
 
         // Arena
         this.arena.create()
-
-        this.createBattleZoneIndicator()
 
         // Benches
         this.playerBench.create()
@@ -62,7 +61,7 @@ export default class CombatScene extends Phaser.Scene {
         })
     }
 
-    createBattleZoneIndicator() {
+    createBattleZone() {
         this.battleZone = this.add.rectangle(
             400,
             300,
@@ -95,42 +94,6 @@ export default class CombatScene extends Phaser.Scene {
         )
 
         this.battleZoneLabel.setOrigin(0.5)
-        this.battleZoneLabel.setAlpha(0.25)
-    }
-
-    showBattleZoneHighlight(valid = true) {
-
-        const color = valid
-            ? 0x66ff66
-            : 0xff6666
-
-        this.battleZone.setStrokeStyle(
-            6,
-            color,
-            0.9
-        )
-
-        this.battleZone.setFillStyle(
-            color,
-            0.12
-        )
-
-        this.battleZoneLabel.setAlpha(0.9)
-    }
-
-    hideBattleZoneHighlight() {
-
-        this.battleZone.setStrokeStyle(
-            4,
-            0xffffff,
-            0.15
-        )
-
-        this.battleZone.setFillStyle(
-            0xffffff,
-            0.03
-        )
-
         this.battleZoneLabel.setAlpha(0.25)
     }
 }
