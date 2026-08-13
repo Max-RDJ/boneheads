@@ -1,111 +1,73 @@
 export default class TurnSystem {
 
-    constructor(scene, combatSystem) {
-
+    constructor(scene) {
         this.scene = scene
-        this.combat = combatSystem
 
         this.turn = 1
-
-        this.playerDeployedThisTurn = []
-        this.playerActionsThisTurn = []
-
-        this.isResolving = false
+        this.phase = 'player_deployment'
+        this.isPlayerTurn = true
     }
 
-    onPlayerDeploy(sprite) {
-
-        if (!this.playerDeployedThisTurn.includes(sprite)) {
-            this.playerDeployedThisTurn.push(sprite)
-        }
+    start() {
+        console.log('Player deployment phase')
     }
 
-    canAct(sprite) {
-
-        if (!sprite || sprite.isDead) {
-            return false
-        }
-
-        return true
-    }
-
-    attack(attacker, defender) {
-
-        if (this.isResolving) {
+    endPlayerTurn() {
+        if (!this.isPlayerTurn) {
             return
         }
 
-        if (!this.canAct(attacker)) {
+        if (this.phase === 'player_deployment') {
+            this.startEnemyDeployment()
             return
         }
 
-        if (!defender || defender.isDead) {
+        if (this.phase === 'player_combat') {
+            this.startEnemyCombat()
+            return
+        }
+    }
+
+    startEnemyDeployment() {
+        this.isPlayerTurn = false
+        this.phase = 'enemy_deployment'
+
+        console.log('Enemy deployment')
+
+        this.scene.enemyBench.deployRandomUnits(3)
+
+        this.endEnemyTurn()
+    }
+
+    endEnemyTurn() {
+        if (this.phase === 'enemy_deployment') {
+            this.startPlayerCombat()
             return
         }
 
-        this.combat.attack(
-            attacker,
-            defender
-        )
-
-        this.playerActionsThisTurn.push({
-            type: 'attack',
-            attacker,
-            defender
-        })
-    }
-
-    guard(sprite) {
-
-        if (!this.canAct(sprite)) {
-            return
+        if (this.phase === 'enemy_combat') {
+            this.startPlayerCombat()
         }
-
-        sprite.isGuarding = true
-
-        this.playerActionsThisTurn.push({
-            type: 'guard',
-            sprite
-        })
     }
 
-    endTurn() {
-
-        this.turn++
-
-        this.playerDeployedThisTurn = []
-        this.playerActionsThisTurn = []
-
-        this.resetGuards()
-        this.cleanupDeadUnits()
+    startPlayerCombat() {
+        this.isPlayerTurn = true
+        this.phase = 'player_combat'
     }
 
-    resetGuards() {
+    startEnemyCombat() {
+        this.isPlayerTurn = false
+        this.phase = 'enemy_combat'
 
-        const units =
-            this.scene.playerBench.getLivingUnits()
+        // Temporary:
+        // AI will eventually attack/guard here.
 
-        units.forEach(unit => {
-            unit.isGuarding = false
-        })
+        this.endEnemyTurn()
     }
 
-    cleanupDeadUnits() {
+    
+    // Separate function to use in case a bonehead has an effect that prevents the opponent from attacking and guarding for a turn
+    skipActPhase() {
 
-        const playerUnits =
-            this.scene.playerBench.getLivingUnits()
-
-        const enemyUnits =
-            this.scene.enemyBench.getLivingUnits()
-
-        console.log(
-            'Player alive:',
-            playerUnits.length
-        )
-
-        console.log(
-            'Enemy alive:',
-            enemyUnits.length
-        )
     }
 }

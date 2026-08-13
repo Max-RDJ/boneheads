@@ -2,7 +2,6 @@ import { BONEHEAD_DB } from '../data/boneheadDB'
 import { DEPTH } from '../config/depth'
 import { playerData } from '../state/playerData'
 import { startSpriteBlinking } from '../helpers/startSpriteBlinking'
-import { showBattleZoneHighlight, hideBattleZoneHighlight } from './ArenaSystem'
 
 
 const SLOT_SPACING = 100
@@ -156,7 +155,6 @@ export default class PlayerBenchSystem {
     }
 
     deploy(sprite) {
-
         if (sprite.location === 'battle') {
             this.moveToBattle(sprite)
             return
@@ -167,18 +165,40 @@ export default class PlayerBenchSystem {
             return
         }
 
+        const battleSlot =
+            this.getAvailableBattleSlot()
+
+        sprite.battleSlot = battleSlot
+
         this.battleUnits.push(sprite)
 
         sprite.location = 'battle'
 
         this.moveToBattle(sprite)
+    }
 
-        this.scene.turnSystem.onPlayerDeploy(sprite)
+    getAvailableBattleSlot() {
+        for (let i = 0; i < MAX_DEPLOYED; i++) {
+
+            const occupied =
+                this.battleUnits.some(
+                    sprite => sprite.battleSlot === i
+                )
+
+            if (!occupied) {
+                return i
+            }
+        }
+
+        return -1
     }
 
     moveToBattle(sprite) {
         const position =
-            this.scene.arena.getBattlePosition()
+            this.scene.arena.getBattlePosition(
+                'player',
+                sprite.battleSlot
+            )
 
         this.scene.tweens.add({
             targets: sprite,

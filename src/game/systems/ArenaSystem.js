@@ -23,6 +23,18 @@ const ARENA = {
     }
 }
 
+const BATTLE_FORMATION = {
+    spacing: 90,
+
+    enemy: {
+        y: 50
+    },
+
+    player: {
+        y: 160
+    }
+}
+
 export default class ArenaSystem {
 
     constructor(scene) {
@@ -141,7 +153,6 @@ export default class ArenaSystem {
     }
 
     isInBattleZone(sprite) {
-
         return (
             sprite.x > ARENA.battle.x &&
             sprite.x < ARENA.battle.x + ARENA.battle.width &&
@@ -150,10 +161,21 @@ export default class ArenaSystem {
         )
     }
 
-    getBattlePosition() {
+    getBattlePosition(team, index) {
+        const centerX =
+            ARENA.battle.width / 2
+
+        const offset =
+            (index - 1) * BATTLE_FORMATION.spacing
+
+        const y =
+            team === 'enemy'
+                ? BATTLE_FORMATION.enemy.y
+                : BATTLE_FORMATION.player.y
+
         return {
-            x: ARENA.battle.x + ARENA.battle.width / 2,
-            y: ARENA.battle.y + ARENA.battle.height / 2
+            x: ARENA.battle.x + centerX + offset,
+            y: ARENA.battle.y + y
         }
     }
 }

@@ -162,13 +162,25 @@ export default class EnemyBenchSystem {
             return
         }
 
+        const battleSlot =
+            this.battleUnits.length
+
+        sprite.battleSlot = battleSlot
+
         this.battleUnits.push(sprite)
+
         sprite.location = 'battle'
+
+        const position =
+            this.scene.arena.getBattlePosition(
+                'enemy',
+                battleSlot
+            )
 
         this.scene.tweens.add({
             targets: sprite,
-            x: BATTLE_X,
-            y: BATTLE_Y,
+            x: position.x,
+            y: position.y,
             duration: 300,
             ease: 'Power2'
         })

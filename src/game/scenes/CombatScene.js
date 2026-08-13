@@ -5,7 +5,10 @@ import EnemyBenchSystem from '../systems/EnemyBenchSystem'
 import CombatSystem from '../systems/CombatSystem'
 import TurnSystem from '../systems/TurnSystem'
 import ArenaSystem from '../systems/ArenaSystem'
-import { Panel } from '../ui/Panel' 
+
+import { UIButton } from '../ui/uiButton'
+import { UI_STYLES } from '../ui/styles'
+
 
 export default class CombatScene extends Phaser.Scene {
 
@@ -30,35 +33,27 @@ export default class CombatScene extends Phaser.Scene {
         this.enemyBench.create(3)
 
         // UI
-        this.createActionButtons()
+        this.createEndTurnButton()
+
+        // Start combat
+        this.turnSystem.start()
     }
 
-    createActionButtons() {
-
-        this.guardButton = this.add.text(
-            660,
+    createEndTurnButton() {
+        this.endTurnButton = new UIButton(
+            this,
+            720,
             300,
-            'GUARD',
+            `End turn`,
+            UI_STYLES.button,
+            () => {
+                this.turnSystem.endPlayerTurn()
+            },
             {
-                fontSize: '30px',
-                fontFamily: 'Arial',
-                backgroundColor: '#228aaa',
-                padding: {
-                    left: 16,
-                    right: 16,
-                    top: 8,
-                    bottom: 8
-                }
+                width: 120,
+                height: 75,
             }
         )
-
-        this.guardButton.setInteractive({
-            cursor: 'pointer'
-        })
-
-        this.guardButton.on('pointerdown', () => {
-            this.turnSystem.selectAction('guard')
-        })
     }
 
     createBattleZone() {
@@ -96,4 +91,5 @@ export default class CombatScene extends Phaser.Scene {
         this.battleZoneLabel.setOrigin(0.5)
         this.battleZoneLabel.setAlpha(0.25)
     }
+
 }
