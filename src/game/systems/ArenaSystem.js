@@ -13,9 +13,9 @@ const ARENA = {
 
     battle: {
         x: 150,
-        y: 190,
+        y: 165,
         width: 500,
-        height: 220
+        height: 250
     },
 
     playerBench: {
@@ -34,7 +34,7 @@ const BATTLE_FORMATION = {
     },
 
     player: {
-        y: 160
+        y: 170
     }
 }
 
@@ -101,21 +101,7 @@ export default class ArenaSystem {
             0.03
         )
 
-        this.battleZoneLabel = this.scene.add.text(
-            ARENA.battle.width / 2,
-            ARENA.battle.height / 2,
-            'DRAG BONEHEAD HERE',
-            {
-                fontSize: '24px',
-                fontFamily: 'Arial',
-                color: '#ffffff'
-            }
-        )
-
-        this.battleZoneLabel.setOrigin(0.5)
-
         this.battlePanel.add(this.battleZone)
-        this.battlePanel.add(this.battleZoneLabel)
     }
 
     showBattleZoneHighlight(valid = true) {
@@ -134,8 +120,6 @@ export default class ArenaSystem {
             color,
             0.12
         )
-
-        this.battleZoneLabel.setAlpha(0.9)
     }
 
     hideBattleZoneHighlight() {
@@ -150,8 +134,6 @@ export default class ArenaSystem {
             0xffffff,
             0.03
         )
-
-        this.battleZoneLabel.setAlpha(0.25)
     }
 
     isInBattleZone(sprite) {

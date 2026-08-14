@@ -81,17 +81,6 @@ export default class CombatScene extends Phaser.Scene {
 
         this.battleZone.setDepth(1)
 
-        this.battleZoneLabel = this.add.text(
-            400,
-            300,
-            'DRAG BONEHEAD HERE',
-            {
-                fontSize: '24px',
-                fontFamily: 'Arial',
-                color: '#ffffff'
-            }
-        )
-
         this.battleZoneLabel.setOrigin(0.5)
         this.battleZoneLabel.setAlpha(0.25)
     }
@@ -146,6 +135,7 @@ export default class CombatScene extends Phaser.Scene {
         )
 
         button.setOrigin(0.5)
+        button.setDepth(1001)
 
         button.setInteractive({
             cursor: 'pointer'
@@ -176,12 +166,41 @@ export default class CombatScene extends Phaser.Scene {
 
         allUnits.forEach(sprite => {
             const bars = {
-                hp: this.add.graphics(),
-                guard: this.add.graphics()
+                hpBar: this.add.graphics(),
+                hpText: this.add.text(
+                    sprite.x,
+                    sprite.y,
+                    `${sprite.hp}/${sprite.maxHp}`,
+                    {
+                        fontSize: '10px',
+                        fontFamily: 'Arial',
+                        color: '#ffffff',
+                        align: 'center'
+                    }
+                ),
+
+                guardBar: this.add.graphics(),
+                guardText: this.add.text(
+                    sprite.x,
+                    sprite.y,
+                    `${sprite.guard}/${sprite.maxGuard}`,
+                    {
+                        fontSize: '10px',
+                        fontFamily: 'Arial',
+                        color: '#ffffff',
+                        align: 'center'
+                    }
+                )
             }
 
-            bars.hp.setDepth(100)
-            bars.guard.setDepth(100)
+            bars.hpText.setOrigin(0.5)
+            bars.guardText.setOrigin(0.5)
+
+            bars.hpBar.setDepth(100)
+            bars.hpText.setDepth(101)
+
+            bars.guardBar.setDepth(100)
+            bars.guardText.setDepth(101)
 
             this.healthBars.set(sprite, bars)
         })
@@ -194,45 +213,63 @@ export default class CombatScene extends Phaser.Scene {
 
         this.healthBars.forEach((bars, sprite) => {
 
-            bars.hp.clear()
-            bars.guard.clear()
-
             if (sprite.isDead) {
+                bars.hpBar.clear()
+                bars.guardBar.clear()
+
+                bars.hpText.setVisible(false)
+                bars.guardText.setVisible(false)
+
                 return
             }
 
             const width = 64
-            const height = 6
+            const height = 12
 
             const x = sprite.x - width / 2
             const hpY = sprite.y + 36
-            const guardY = sprite.y + 44
+            const guardY = sprite.y + 50
 
-            // HP background
-            bars.hp.fillStyle(0x333333)
-            bars.hp.fillRect(
+            // HP
+            bars.hpBar.clear()
+
+            bars.hpBar.fillStyle(0x990A17)
+            bars.hpBar.fillRect(
                 x,
                 hpY,
                 width,
                 height
             )
 
-            // HP
             const hpRatio =
                 Math.max(
                     0,
                     Math.min(1, sprite.hp / sprite.maxHp)
                 )
 
-            bars.hp.fillStyle(0x44aa44)
-            bars.hp.fillRect(
+            bars.hpBar.fillStyle(0x44aa44)
+            bars.hpBar.fillRect(
                 x,
                 hpY,
                 width * hpRatio,
                 height
             )
 
-            // Guard
+            bars.hpText.setPosition(
+                sprite.x,
+                hpY + height / 2
+            )
+
+            bars.hpText.setText(
+                `${sprite.hp}/${sprite.maxHp}`
+            )
+
+            bars.hpText.setVisible(true)
+
+
+            // GUARD
+            bars.guardBar.clear()
+
             if (sprite.guard > 0) {
 
                 const guardRatio =
@@ -241,23 +278,36 @@ export default class CombatScene extends Phaser.Scene {
                         Math.min(1, sprite.guard / sprite.maxGuard)
                     )
 
-                // Guard background
-                bars.guard.fillStyle(0x333333)
-                bars.guard.fillRect(
+                bars.guardBar.fillStyle(0x333333)
+                bars.guardBar.fillRect(
                     x,
                     guardY,
                     width,
                     height
                 )
 
-                // Guard amount
-                bars.guard.fillStyle(0xaaaaaa)
-                bars.guard.fillRect(
+                bars.guardBar.fillStyle(0x0096FF)
+                bars.guardBar.fillRect(
                     x,
                     guardY,
                     width * guardRatio,
                     height
                 )
+
+                bars.guardText.setPosition(
+                    sprite.x,
+                    guardY + height / 2
+                )
+
+                bars.guardText.setText(
+                    `${sprite.guard}/${sprite.maxGuard}`
+                )
+
+                bars.guardText.setVisible(true)
+
+            } else {
+
+                bars.guardText.setVisible(false)
             }
         })
     }
