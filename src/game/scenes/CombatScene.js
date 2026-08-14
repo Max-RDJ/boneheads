@@ -241,19 +241,57 @@ export default class CombatScene extends Phaser.Scene {
                 height
             )
 
+            const radius = 4
+
+            bars.hpBar.clear()
+
+            // Shadow
+            bars.hpBar.fillStyle(0x000000, 0.5)
+            bars.hpBar.fillRoundedRect(
+                x + 2,
+                hpY + 2,
+                width,
+                height,
+                radius
+            )
+
+            // Outer border
+            bars.hpBar.fillStyle(0x111111, 1)
+            bars.hpBar.fillRoundedRect(
+                x,
+                hpY,
+                width,
+                height,
+                radius
+            )
+
+            // Empty HP background
+            bars.hpBar.fillStyle(0x990A17, 1)
+            bars.hpBar.fillRoundedRect(
+                x + 1,
+                hpY + 1,
+                width - 2,
+                height - 2,
+                radius - 1
+            )
+
+            // HP fill
             const hpRatio =
                 Math.max(
                     0,
                     Math.min(1, sprite.hp / sprite.maxHp)
                 )
 
-            bars.hpBar.fillStyle(0x44aa44)
-            bars.hpBar.fillRect(
-                x,
-                hpY,
-                width * hpRatio,
-                height
-            )
+            if (hpRatio > 0) {
+                bars.hpBar.fillStyle(0x44aa44, 1)
+                bars.hpBar.fillRoundedRect(
+                    x + 1,
+                    hpY + 1,
+                    (width - 2) * hpRatio,
+                    height - 2,
+                    radius - 1
+                )
+            }
 
             bars.hpText.setPosition(
                 sprite.x,
@@ -271,6 +309,7 @@ export default class CombatScene extends Phaser.Scene {
             bars.guardBar.clear()
 
             if (sprite.guard > 0) {
+                const radius = 4
 
                 const guardRatio =
                     Math.max(
@@ -278,21 +317,47 @@ export default class CombatScene extends Phaser.Scene {
                         Math.min(1, sprite.guard / sprite.maxGuard)
                     )
 
-                bars.guardBar.fillStyle(0x333333)
-                bars.guardBar.fillRect(
+                // Shadow
+                bars.guardBar.fillStyle(0x000000, 0.5)
+                bars.guardBar.fillRoundedRect(
+                    x + 2,
+                    guardY + 2,
+                    width,
+                    height,
+                    radius
+                )
+
+                // Outer border
+                bars.guardBar.fillStyle(0x111111, 1)
+                bars.guardBar.fillRoundedRect(
                     x,
                     guardY,
                     width,
-                    height
+                    height,
+                    radius
                 )
 
-                bars.guardBar.fillStyle(0x0096FF)
-                bars.guardBar.fillRect(
-                    x,
-                    guardY,
-                    width * guardRatio,
-                    height
+                // Empty guard background
+                bars.guardBar.fillStyle(0x333333, 1)
+                bars.guardBar.fillRoundedRect(
+                    x + 1,
+                    guardY + 1,
+                    width - 2,
+                    height - 2,
+                    radius - 1
                 )
+
+                // Guard fill
+                if (guardRatio > 0) {
+                    bars.guardBar.fillStyle(0x0096FF, 1)
+                    bars.guardBar.fillRoundedRect(
+                        x + 1,
+                        guardY + 1,
+                        (width - 2) * guardRatio,
+                        height - 2,
+                        radius - 1
+                    )
+                }
 
                 bars.guardText.setPosition(
                     sprite.x,
@@ -306,7 +371,6 @@ export default class CombatScene extends Phaser.Scene {
                 bars.guardText.setVisible(true)
 
             } else {
-
                 bars.guardText.setVisible(false)
             }
         })

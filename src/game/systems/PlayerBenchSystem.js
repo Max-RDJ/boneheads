@@ -132,8 +132,8 @@ export default class PlayerBenchSystem {
             const inside =
                 this.isInBattleZone(sprite)
 
-            if (!inside) {
-                this.scene.arena.hideBattleZoneHighlight()
+            if (inside) {
+                this.scene.arena.glowBattleZoneHighlight()
                 return
             }
 

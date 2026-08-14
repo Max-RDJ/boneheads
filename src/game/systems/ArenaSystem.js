@@ -38,6 +38,9 @@ const BATTLE_FORMATION = {
     }
 }
 
+const battleZoneRadius = 12
+const battleBorderWidth = 5
+
 export default class ArenaSystem {
 
     constructor(scene) {
@@ -82,58 +85,60 @@ export default class ArenaSystem {
     }
 
     createBattleZoneIndicator() {
+        const radius = 12
 
-        this.battleZone = this.scene.add.rectangle(
-            ARENA.battle.width / 2,
-            ARENA.battle.height / 2,
-            ARENA.battle.width - 20,
-            ARENA.battle.height - 20
+        this.battleZone = this.scene.add.graphics()
+
+        this.battleZone.fillStyle(
+            0xffffff,
+            0
         )
 
-        this.battleZone.setStrokeStyle(
-            4,
-            0xffffff,
-            0.15
-        )
-
-        this.battleZone.setFillStyle(
-            0xffffff,
-            0.03
+        this.battleZone.fillRoundedRect(
+            0,
+            0,
+            ARENA.battle.width,
+            ARENA.battle.height,
+            radius
         )
 
         this.battlePanel.add(this.battleZone)
     }
 
-    showBattleZoneHighlight(valid = true) {
+    drawBattleZone(color, alpha) {
+        const inset = battleBorderWidth / 2
+        const radius = battleZoneRadius - inset
 
+        this.battleZone.clear()
+
+        this.battleZone.fillStyle(
+            color,
+            alpha
+        )
+
+        this.battleZone.fillRoundedRect(
+            inset,
+            inset,
+            ARENA.battle.width - battleBorderWidth,
+            ARENA.battle.height - battleBorderWidth,
+            radius
+        )
+    }
+
+    showBattleZoneHighlight(valid = true) {
         const color = valid
             ? 0x66ff66
             : 0xff6666
 
-        this.battleZone.setStrokeStyle(
-            6,
-            color,
-            0.9
-        )
-
-        this.battleZone.setFillStyle(
-            color,
-            0.12
-        )
+        this.drawBattleZone(color, 0.12)
     }
 
     hideBattleZoneHighlight() {
+        this.drawBattleZone(0xffffff, 0)
+    }
 
-        this.battleZone.setStrokeStyle(
-            4,
-            0xffffff,
-            0.15
-        )
-
-        this.battleZone.setFillStyle(
-            0xffffff,
-            0.03
-        )
+    glowBattleZoneHighlight() {
+        this.drawBattleZone(0x66ff66, 0.24)
     }
 
     isInBattleZone(sprite) {
