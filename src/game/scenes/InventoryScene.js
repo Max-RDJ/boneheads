@@ -24,6 +24,10 @@ export default class InventoryScene extends Phaser.Scene {
 
     create() {
 
+        this.paintMode = false
+        this.selectedPaint = null
+        this.paintModeIndicator = null
+
         this.tooltip = new Tooltip(this)
 
         this.coinCounter = new CoinCounter(
