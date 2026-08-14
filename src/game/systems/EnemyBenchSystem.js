@@ -3,6 +3,9 @@ import Phaser from 'phaser'
 import { BONEHEAD_DB } from '../data/boneheadDB'
 import { BONEHEAD_COLOURS } from '../data/boneheadColours'
 import { startSpriteBlinking } from '../helpers/startSpriteBlinking'
+import { getCurrentEnemy } from './ProgressSystem'
+import { generateInstanceId } from '../helpers/generateInstanceId'
+import { getBoneheadStats } from '../helpers/getBoneheadStats'
 
 
 const SLOT_SPACING = 100
@@ -21,13 +24,18 @@ export default class EnemyBenchSystem {
         this.sprites = []
     }
 
-    create(count = 3) {
+    create() {
         this.sprites = []
         this.slots = []
         this.slotPositions = []
         this.battleUnits = []
 
-        const enemyBoneheads = this.generateEnemies(count)
+        const enemy = getCurrentEnemy()
+
+        const enemyBoneheads = enemy.bag.map(unit => ({
+            ...unit,
+            instanceId: generateInstanceId()
+        }))
 
         const slotCount = enemyBoneheads.length
 
@@ -51,7 +59,8 @@ export default class EnemyBenchSystem {
         })
     }
 
-    generateEnemies(count) {
+    // Generate random enemies
+    /* generateEnemies(count) {
         const types = Object.keys(BONEHEAD_DB)
 
         return Array.from({ length: count }, (_, index) => {
@@ -68,9 +77,9 @@ export default class EnemyBenchSystem {
                 colour
             }
         })
-    }
+    } */
 
-    getRandomColour() {
+    /* getRandomColour() {
         const colours = Object.entries(BONEHEAD_COLOURS)
 
         const totalWeight = colours.reduce(
@@ -89,7 +98,7 @@ export default class EnemyBenchSystem {
         }
 
         return colours[0][0]
-    }
+    } */
 
     createBonehead(unit, index) {
         
@@ -106,6 +115,7 @@ export default class EnemyBenchSystem {
         )
 
         sprite.unit = unit
+        sprite.hp = getBoneheadStats(unit).hp
         sprite.slotIndex = index
         sprite.location = 'bench'
         sprite.isDead = false

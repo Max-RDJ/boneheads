@@ -30,7 +30,7 @@ export default class CombatScene extends Phaser.Scene {
 
         // Benches
         this.playerBench.create()
-        this.enemyBench.create(3)
+        this.enemyBench.create()
 
         // UI
         this.createEndTurnButton()

@@ -1,4 +1,7 @@
 import {Panel} from '../ui/Panel'
+import { enemies } from '../data/enemyDB'
+import { getCurrentEnemy } from './ProgressSystem'
+
 
 const ARENA = {
     enemyBench: {
@@ -43,6 +46,8 @@ export default class ArenaSystem {
 
     create() {
 
+        const enemy = getCurrentEnemy()
+
         this.enemyBenchPanel = new Panel(
             this.scene,
             ARENA.enemyBench.x,
@@ -50,7 +55,7 @@ export default class ArenaSystem {
             ARENA.enemyBench.width,
             ARENA.enemyBench.height,
             {
-                title: 'Enemy'
+                title: enemy.name
             }
         )
 

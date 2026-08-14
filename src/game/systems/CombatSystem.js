@@ -1,4 +1,6 @@
 import { getBoneheadStats } from '../helpers/getBoneheadStats'
+import { playerData } from '../state/playerData'
+
 
 export default class CombatSystem {
 
@@ -45,7 +47,7 @@ export default class CombatSystem {
 
         const damage = attackerStats.accuracy
 
-        defender.unit.hp -= damage
+        defender.hp -= damage
 
         console.log(
             `${attacker.unit.typeId} attacks ${defender.unit.typeId}`
@@ -56,7 +58,7 @@ export default class CombatSystem {
         )
 
         if (defender.unit.hp <= 0) {
-            this.defeat(defender)
+            this.knockout(defender)
         }
 
         this.selectedAttacker = null
@@ -64,7 +66,7 @@ export default class CombatSystem {
         return true
     }
 
-    defeat(sprite) {
+    knockout(sprite) {
         sprite.isDead = true
 
         this.scene.tweens.add({
@@ -73,6 +75,7 @@ export default class CombatSystem {
             scale: 0,
             duration: 300
         })
+        this.scene.turnSystem.checkBattleResult()
     }
 
 }

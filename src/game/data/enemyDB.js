@@ -1,29 +1,61 @@
-const enemies =[
+import { generateInstanceId } from "../helpers/generateInstanceId"
+
+export const enemies =[
     {
         name: "Timmy",
         bag: [
-            { instanceId: "e1", typeId: "beefhead" },
-            { instanceId: "e2", typeId: "beefhead" },
-            { instanceId: "e3", typeId: "beefhead" }
+            {
+                typeId: "beefhead",
+                colour: "blue"    
+            },
+            {
+                typeId: "beefhead",
+                colour: "blue"    
+            },
+            {
+                typeId: "beefhead",
+                colour: "blue"    
+            },
         ],
-        tier: 1
+        enemyTier: 1,
+        quote: "Wanna pway?"
     },
     {
         name: "Jimmy",
         bag: [
-            { instanceId: "e1", typeId: "beefhead" },
-            { instanceId: "e2", typeId: "beefhead" },
-            { instanceId: "e3", typeId: "ploder" }
+            {
+                typeId: "ploder",
+                colour: "blue"    
+            },
+            {
+                typeId: "beefhead",
+                colour: "blue"    
+            },
+            {
+                typeId: "beefhead",
+                colour: "red"    
+            },
         ],
-        tier: 1
+        enemyTier: 1,
+        quote: "At least I'm not Timmy."
     },
     {
         name: "Bimmy",
         bag: [
-            { instanceId: "e1", typeId: "beefhead" },
-            { instanceId: "e2", typeId: "beefhead" },
-            { instanceId: "e3", typeId: "ploder" }
+            {
+                typeId: "julius",
+                colour: "blue"    
+            },
+            {
+                typeId: "beefhead",
+                colour: "blue"    
+            },
+            {
+                typeId: "beefhead",
+                colour: "blue"    
+            },
         ],
-        tier: 1
+        enemyTier: 1,
+        quote: "I'm bimmyyyyy!"
     },
 ]

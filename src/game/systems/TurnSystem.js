@@ -1,3 +1,6 @@
+import { advanceEnemy } from './ProgressSystem'
+
+
 export default class TurnSystem {
 
     constructor(scene) {
@@ -69,5 +72,30 @@ export default class TurnSystem {
     // Separate function to use in case a bonehead has an effect that prevents the opponent from attacking and guarding for a turn
     skipActPhase() {
 
+    }
+
+    checkBattleResult() {
+        const enemyAlive =
+            this.scene.enemyBench.getLivingUnits().length > 0
+
+        const playerAlive =
+            this.scene.playerBench.getLivingUnits().length > 0
+
+        if (!enemyAlive) {
+            this.playerVictory()
+            return
+        }
+
+        if (!playerAlive) {
+            this.playerLoss()
+        }
+    }
+
+    playerVictory() {
+        advanceEnemy()
+    }
+
+    playerLoss() {
+        alert("Oh dear!")
     }
 }

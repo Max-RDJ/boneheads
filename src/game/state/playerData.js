@@ -16,7 +16,7 @@ export const playerData = {
         boosters: null,
         paints: null,
         rerollCount: 0
-    }
+    },
 
 }
 
