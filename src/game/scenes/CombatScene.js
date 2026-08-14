@@ -8,6 +8,7 @@ import ArenaSystem from '../systems/ArenaSystem'
 import { VictoryScreen } from '../ui/VictoryScreen'
 import { advanceEnemy } from '../systems/ProgressSystem'
 
+import { Tooltip } from '../ui/Tooltip'
 import { UIButton } from '../ui/uiButton'
 import { UI_STYLES } from '../ui/styles'
 
@@ -20,10 +21,26 @@ export default class CombatScene extends Phaser.Scene {
 
     create() {
 
+        // Tooltips
+        this.boneheadTooltip = new Tooltip(this)
+        this.paintTooltip = new Tooltip(this)
+
         // Systems
         this.arena = new ArenaSystem(this)
-        this.playerBench = new PlayerBenchSystem(this)
-        this.enemyBench = new EnemyBenchSystem(this)
+        this.boneheadTooltip = new Tooltip(this)
+
+        this.playerBench = new PlayerBenchSystem(
+            this,
+            this.boneheadTooltip,
+            this.paintTooltip
+        )
+
+        this.enemyBench = new EnemyBenchSystem(
+            this,
+            this.boneheadTooltip,
+            this.paintTooltip
+        )
+
         this.combatSystem = new CombatSystem(this)
         this.turnSystem = new TurnSystem(this)
 
@@ -38,7 +55,7 @@ export default class CombatScene extends Phaser.Scene {
         this.createEndTurnButton()
         this.actionButtons = []
         this.createHealthBars()
-
+        
         // Start combat
         this.turnSystem.start()
     }

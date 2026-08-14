@@ -6,6 +6,7 @@ import { startSpriteBlinking } from '../helpers/startSpriteBlinking'
 import { getCurrentEnemy } from './ProgressSystem'
 import { generateInstanceId } from '../helpers/generateInstanceId'
 import { getBoneheadStats } from '../helpers/getBoneheadStats'
+import { COLOURS } from '../ui/ColourMap'
 
 
 const SLOT_SPACING = 100
@@ -16,8 +17,9 @@ const BATTLE_Y = 220
 
 export default class EnemyBenchSystem {
 
-    constructor(scene) {
+    constructor(scene, tooltip) {
         this.scene = scene
+        this.tooltip = tooltip
         this.slots = []
         this.slotPositions = []
         this.battleUnits = []
@@ -102,6 +104,8 @@ export default class EnemyBenchSystem {
 
     createBonehead(unit, index) {
         
+        const data = BONEHEAD_DB[unit.typeId]
+        
         const position =
             this.slotPositions[index]
 
@@ -143,6 +147,19 @@ export default class EnemyBenchSystem {
                 attacker,
                 sprite
             )
+        })
+
+        sprite.on('pointermove', pointer => {
+            this.tooltip.show(
+                pointer,
+                data.name,
+                `Attack: ${stats.attack}\nHP: ${sprite.hp}/${sprite.maxHp}`,
+                COLOURS[unit.colour]
+            )
+        })
+
+        sprite.on('pointerout', () => {
+            this.tooltip.hide()
         })
 
         this.slots[index] = sprite

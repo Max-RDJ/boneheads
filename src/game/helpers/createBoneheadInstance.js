@@ -25,11 +25,15 @@ export function getRandomBoneheadColour() {
 }
 
 export function createBoneheadInstance(id) {
-    const baseBonehead = BONEHEAD_DB[id]
-    const colour = getRandomBoneheadColour()
+    const bonehead = BONEHEAD_DB[id]
 
     return {
-        ...baseBonehead,
-        colour
+        typeId: id,
+        colour: getRandomBoneheadColour(),
+        attack: bonehead.stats.attack,
+        maxHp: bonehead.stats.hp,
+        currentHp: bonehead.stats.hp,
+        maxGuard: Math.round(bonehead.stats.hp / 2),
+        currentGuard: 0
     }
 }

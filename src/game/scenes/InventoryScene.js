@@ -29,6 +29,7 @@ export default class InventoryScene extends Phaser.Scene {
         this.paintModeIndicator = null
 
         this.tooltip = new Tooltip(this)
+        this.paintTooltip = new Tooltip(this)
 
         this.coinCounter = new CoinCounter(
             this,
@@ -162,18 +163,7 @@ export default class InventoryScene extends Phaser.Scene {
             }
         )
 
-        const boneheads = playerData.bag.contents.map(unit => {
-
-            const bonehead = BONEHEAD_DB[unit.typeId]
-            const stats = getBoneheadStats(unit)
-
-            return {
-                ...bonehead,
-                instanceId: unit.instanceId,
-                colour: unit.colour,
-                stats: getBoneheadStats(unit)
-            }
-        })
+        const boneheads = playerData.bag.contents
 
         const columns = 5
         const spacingX = 140
@@ -207,6 +197,7 @@ export default class InventoryScene extends Phaser.Scene {
                     bonehead,
                     this.handleBoneheadClick.bind(this),
                     this.tooltip,
+                    this.paintTooltip,
                     { showPrice: false }
                 )
 

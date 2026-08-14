@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 
 import { UI_STYLES } from './styles'
 
+
 export class Tooltip extends Phaser.GameObjects.Container {
 
     constructor(scene) {
@@ -18,7 +19,8 @@ export class Tooltip extends Phaser.GameObjects.Container {
             this.tooltipHeight / 2,
             this.tooltipWidth,
             this.tooltipHeight,
-            0x222222
+            0x222222,
+            0.75
         )
             .setStrokeStyle(2, 0xffffff)
 
@@ -95,8 +97,8 @@ export class Tooltip extends Phaser.GameObjects.Container {
 
         const offset = 15
 
-        let x = pointer.worldX + offset
-        let y = pointer.worldY + offset
+        let x = pointer.x + offset
+        let y = pointer.y + offset
 
         const screenWidth = this.scene.scale.width
         const screenHeight = this.scene.scale.height
@@ -127,5 +129,66 @@ export class Tooltip extends Phaser.GameObjects.Container {
 
     hide() {
         this.setVisible(false)
+    }
+
+    showNextTo(tooltip, title, description, titleColour = 0xffffff) {
+        this.titleText.setText(title)
+        this.descriptionText.setText(description)
+
+        this.titleText.setColor(
+            Phaser.Display.Color.IntegerToColor(titleColour).rgba
+        )
+
+        const padding = 10
+        const gap = 5
+
+        this.tooltipHeight =
+            this.titleText.height +
+            gap +
+            this.descriptionText.height +
+            padding * 2
+
+        this.background.setSize(
+            this.tooltipWidth,
+            this.tooltipHeight
+        )
+
+        this.background.setPosition(
+            this.tooltipWidth / 2,
+            this.tooltipHeight / 2
+        )
+
+        this.setSize(
+            this.tooltipWidth,
+            this.tooltipHeight
+        )
+
+        const offset = 10
+
+        let x =
+            tooltip.x +
+            tooltip.tooltipWidth +
+            offset
+
+        let y = tooltip.y
+
+        const screenWidth = this.scene.scale.width
+        const screenHeight = this.scene.scale.height
+
+        if (x + this.tooltipWidth > screenWidth) {
+            x =
+                tooltip.x -
+                this.tooltipWidth -
+                offset
+        }
+
+        y = Phaser.Math.Clamp(
+            y,
+            0,
+            screenHeight - this.tooltipHeight
+        )
+
+        this.setPosition(x, y)
+        this.setVisible(true)
     }
 }

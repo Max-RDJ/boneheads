@@ -3,6 +3,8 @@ import { DEPTH } from '../config/depth'
 import { playerData } from '../state/playerData'
 import { startSpriteBlinking } from '../helpers/startSpriteBlinking'
 import { getBoneheadStats } from '../helpers/getBoneheadStats'
+import { COLOURS } from '../ui/ColourMap'
+import { BONEHEAD_COLOURS } from '../data/boneheadColours'
 
 
 const SLOT_SPACING = 100
@@ -19,8 +21,10 @@ const MAX_DEPLOYED = 3
 
 export default class PlayerBenchSystem {
 
-    constructor(scene) {
+    constructor(scene, tooltip, paintTooltip) {
         this.scene = scene
+        this.tooltip = tooltip
+        this.paintTooltip = paintTooltip
         this.slots = []
         this.slotPositions = []
         this.battleUnits = []
@@ -94,11 +98,31 @@ export default class PlayerBenchSystem {
 
         startSpriteBlinking(this.scene, sprite)
 
-        sprite.on('pointerdown', () => {
-            if (sprite.isDead) {
-                return
+        sprite.on('pointermove', pointer => {
+            this.tooltip.show(
+                pointer,
+                data.name,
+                `Attack: ${stats.attack}\nHP: ${sprite.hp}/${sprite.maxHp}`,
+                COLOURS[unit.colour]
+            )
+
+            const paint = BONEHEAD_COLOURS[unit.colour]
+
+            if (paint?.title && paint?.description) {
+                this.paintTooltip.showNextTo(
+                    this.tooltip,
+                    paint.title,
+                    paint.description,
+                    COLOURS[unit.colour]
+                )
+            } else {
+                this.paintTooltip.hide()
             }
-            this.scene.combatSystem.selectUnit(sprite)
+        })
+
+        sprite.on('pointerout', () => {
+            this.tooltip.hide()
+            this.paintTooltip.hide()
         })
     }
 

@@ -32,12 +32,14 @@ export default class ShopScene extends Phaser.Scene {
         super('ShopScene')
     }
 
-    create(data) {
+    create(data = {}) {
         this.tooltip = new Tooltip(this)
+        this.paintTooltip = new Tooltip(this)
 
-        if (data.refreshShop) {
+        if (!playerData.shop.boneheads || data.refreshShop) {
             this.refreshShop()
         }
+
 
         this.coinCounter = new CoinCounter(
             this,
@@ -67,6 +69,18 @@ export default class ShopScene extends Phaser.Scene {
         this.createRerollButton()
     }
 
+    generateShopStock() {
+        return {
+            boneheads: this.generateBoneheadStock(),
+            boosters: this.generateBoosterStock(),
+            paints: this.generatePaintStock()
+        }
+    }
+
+    refreshShop() {
+        playerData.shop = this.generateShopStock()
+    }
+
     createBoneheadMarket() {
         const panelLayout = SHOP_LAYOUT.panels.market
 
@@ -81,10 +95,6 @@ export default class ShopScene extends Phaser.Scene {
                 errorOverlay: true
             }
         )
-
-        if (!playerData.shop.boneheads) {
-            playerData.shop.boneheads = this.generateBoneheadStock()
-        }
 
         this.createBoneheadCards(this.boneheadPanel)
     }
@@ -114,7 +124,8 @@ export default class ShopScene extends Phaser.Scene {
                 y,
                 bonehead,
                 this.buyBonehead.bind(this),
-                this.tooltip
+                this.tooltip,
+                this.paintTooltip
             )
 
             card.image.unit = {
@@ -132,12 +143,14 @@ export default class ShopScene extends Phaser.Scene {
         })
     }
 
+    
     generateBoneheadStock() {
         const ids = Phaser.Utils.Array.Shuffle(
             Object.keys(BONEHEAD_DB)
         ).slice(0, 5)
 
         return ids.map(id => ({
+            ...BONEHEAD_DB[id],
             ...createBoneheadInstance(id),
             instanceId: generateInstanceId(),
             sold: false
@@ -157,7 +170,10 @@ export default class ShopScene extends Phaser.Scene {
 
         playerData.coins -= bonehead.price
 
+        const purchasedBonehead = createBoneheadInstance(bonehead.id)
+
         playerData.bag.contents.push({
+            ...purchasedBonehead,
             instanceId: generateInstanceId(),
             typeId: bonehead.id,
             colour: bonehead.colour
@@ -177,6 +193,7 @@ export default class ShopScene extends Phaser.Scene {
 
         if (card) {
             this.tooltip.hide()
+            this.paintTooltip.hide()
 
             const x = card.x
             const y = card.y
@@ -204,47 +221,7 @@ export default class ShopScene extends Phaser.Scene {
             }
         )
 
-        if (!playerData.shop.boosters) {
-            playerData.shop.boosters = this.generateBoosterStock()
-        }
-
-        const boosterLayout = SHOP_LAYOUT.boosters
-
-        this.boosterCards = []
-
-        playerData.shop.boosters.forEach((booster, index) => {
-
-            const x =
-                boosterLayout.offsetX +
-                index * boosterLayout.spacing
-
-            const y =
-                boosterLayout.offsetY
-
-            if (booster.sold) {
-                this.createSoldText(
-                    this.boosterPanel,
-                    x,
-                    y
-                )
-                return
-            }
-
-            const card = new BoosterCard(
-                this,
-                x,
-                y,
-                booster,
-                this.buyBooster.bind(this),
-                this.tooltip
-            )
-
-            card.boosterId = booster.instanceId
-
-            this.boosterCards.push(card)
-
-            this.boosterPanel.addContent(card)
-        })
+        this.createBoosterCards(this.boosterPanel)
     }
 
     generateBoosterStock() {
@@ -277,6 +254,42 @@ export default class ShopScene extends Phaser.Scene {
         }
 
         return stock
+    }
+
+    createBoosterCards(panel) {
+        const boosterLayout = SHOP_LAYOUT.boosters
+
+        this.boosterCards = []
+
+        playerData.shop.boosters.forEach((booster, index) => {
+
+            const x =
+                boosterLayout.offsetX +
+                index * boosterLayout.spacing
+
+            const y =
+                boosterLayout.offsetY
+
+            if (booster.sold) {
+                this.createSoldText(panel, x, y)
+                return
+            }
+
+            const card = new BoosterCard(
+                this,
+                x,
+                y,
+                booster,
+                this.buyBooster.bind(this),
+                this.tooltip
+            )
+
+            card.boosterId = booster.instanceId
+
+            this.boosterCards.push(card)
+
+            panel.addContent(card)
+        })
     }
 
     buyBooster(booster) {
@@ -332,10 +345,10 @@ export default class ShopScene extends Phaser.Scene {
             }
         )
 
-        if (!playerData.shop.paints) {
-            playerData.shop.paints = this.generatePaintStock()
-        }
+        this.createPaintCards(this.paintPanel)
+    }
 
+    createPaintCards(panel) {
         const paintLayout = SHOP_LAYOUT.paint
 
         this.paintCards = []
@@ -354,11 +367,7 @@ export default class ShopScene extends Phaser.Scene {
                 row * paintLayout.spacing
 
             if (paint.sold) {
-                this.createSoldText(
-                    this.paintPanel,
-                    x,
-                    y
-                )
+                this.createSoldText(panel, x, y)
                 return
             }
 
@@ -375,7 +384,7 @@ export default class ShopScene extends Phaser.Scene {
 
             this.paintCards.push(card)
 
-            this.paintPanel.addContent(card)
+            panel.addContent(card)
         })
     }
 
@@ -509,12 +518,6 @@ export default class ShopScene extends Phaser.Scene {
         const rerollCount = playerData.rerollCount || 0
 
         return Math.ceil(baseCost + (rerollCount * costMultiplier))
-    }
-
-    refreshShop() {
-        playerData.shop.boneheads = this.generateBoneheadStock()
-        playerData.shop.boosters = this.generateBoosterStock()
-        playerData.shop.paints = this.generatePaintStock()
     }
 
 }

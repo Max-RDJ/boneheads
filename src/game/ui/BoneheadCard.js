@@ -2,18 +2,30 @@ import Phaser from 'phaser'
 
 import { COLOURS } from './ColourMap'
 import { UI_STYLES } from './styles'
-import { startSpriteBlinking } from '../helpers/startSpriteBlinking'
+import { BONEHEAD_COLOURS } from '../data/boneheadColours'
+import { BONEHEAD_DB } from '../data/boneheadDB'
+import { getBoneheadStats } from '../helpers/getBoneheadStats'
 
 
 export class BoneheadCard extends Phaser.GameObjects.Container {
 
-    constructor(scene, x, y, bonehead, onBuy, tooltip, options = {}) {
+    constructor(
+        scene,
+        x,
+        y,
+        bonehead,
+        onBuy,
+        tooltip,
+        paintTooltip,
+        options = {}
+    ) {
 
         super(scene, x, y)
 
         this.scene = scene
         this.bonehead = bonehead
         this.tooltip = tooltip
+        this.paintTooltip = paintTooltip
         this.onBuy = onBuy
 
         scene.add.existing(this)
@@ -40,27 +52,43 @@ export class BoneheadCard extends Phaser.GameObjects.Container {
     }
 
     setupHover() {
+        const stats = getBoneheadStats(this.bonehead)
+        const data = BONEHEAD_DB[this.bonehead.typeId]
 
         this.image.on('pointermove', pointer => {
 
             this.tooltip.show(
                 pointer,
-                this.bonehead.name,
-                `Attack: ${this.bonehead.stats.attack}\nhp: ${this.bonehead.stats.hp}`,
+                data.name,
+                `Attack: ${stats.attack}\nHP: ${stats.hp}`,
                 COLOURS[this.bonehead.colour]
             )
 
+            const paint =
+                BONEHEAD_COLOURS[this.bonehead.colour]
+
+            if (paint?.title && paint?.description) {
+                this.paintTooltip.showNextTo(
+                    this.tooltip,
+                    paint.title,
+                    paint.description,
+                    COLOURS[this.bonehead.colour]
+                )
+            } else {
+                this.paintTooltip.hide()
+            }
         })
 
         this.image.on('pointerout', () => {
             this.tooltip.hide()
+            this.paintTooltip.hide()
         })
     }
 
     createImage(bonehead) {
 
         const textureKey =
-            `${bonehead.id}_idle_${bonehead.colour}`
+            `${bonehead.typeId}_idle_${bonehead.colour}`
 
         this.image = this.scene.add.image(
             0,
