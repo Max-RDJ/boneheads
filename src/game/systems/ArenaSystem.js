@@ -65,9 +65,6 @@ export default class ArenaSystem {
             ARENA.battle.y,
             ARENA.battle.width,
             ARENA.battle.height,
-            {
-                title: 'Battle'
-            }
         )
 
         this.playerBenchPanel = new Panel(

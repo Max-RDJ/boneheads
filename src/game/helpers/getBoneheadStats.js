@@ -6,7 +6,8 @@ export function getBoneheadStats(bonehead) {
 
     const stats = {
         attack: baseStats.attack,
-        hp: baseStats.hp
+        hp: baseStats.hp,
+        guard: baseStats.guard
     }
 
     const paintEffect = PAINT_EFFECTS[bonehead.colour]

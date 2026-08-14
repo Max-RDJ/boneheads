@@ -1,15 +1,19 @@
 import { getBoneheadStats } from '../helpers/getBoneheadStats'
-import { playerData } from '../state/playerData'
+import { showAttackOptions, showGuardOption } from '../scenes/CombatScene'
 
 
 export default class CombatSystem {
 
     constructor(scene) {
         this.scene = scene
-        this.selectedAttacker = null
+        this.selectedUnit = null
     }
 
-    selectAttacker(sprite) {
+    selectUnit(sprite) {
+        if (this.scene.turnSystem.phase !== 'player_combat') {
+            return false
+        }
+
         if (!sprite || sprite.isDead) {
             return false
         }
@@ -18,22 +22,23 @@ export default class CombatSystem {
             return false
         }
 
-        if (sprite.deployedTurn === this.scene.turnSystem.turn) {
+        if (sprite.hasActed) {
             return false
         }
 
-        this.selectedAttacker = sprite
+        this.selectedUnit = sprite
 
         console.log(
-            'Selected attacker:',
+            'Selected unit:',
             sprite.unit.typeId
         )
+
+        this.showActionOptions(sprite)
 
         return true
     }
 
     attack(attacker, defender) {
-
         if (!attacker || !defender) {
             return false
         }
@@ -45,23 +50,71 @@ export default class CombatSystem {
         const attackerStats =
             getBoneheadStats(attacker.unit)
 
-        const damage = attackerStats.accuracy
-
-        defender.hp -= damage
+        const damage = attackerStats.attack
 
         console.log(
             `${attacker.unit.typeId} attacks ${defender.unit.typeId}`
         )
 
+        let remainingDamage = damage
+
+        if (defender.guard > 0) {
+            const absorbed = Math.min(
+                defender.guard,
+                remainingDamage
+            )
+
+            defender.guard -= absorbed
+            remainingDamage -= absorbed
+        }
+
+        if (remainingDamage > 0) {
+            defender.hp -= remainingDamage
+        }
+
         console.log(
-            `${defender.unit.typeId} HP: ${defender.unit.hp}`
+            `${defender.unit.typeId} Guard: ${defender.guard}`
         )
 
-        if (defender.unit.hp <= 0) {
+        console.log(
+            `${defender.unit.typeId} HP: ${defender.hp}`
+        )
+
+        attacker.hasActed = true
+
+        if (defender.hp <= 0) {
             this.knockout(defender)
         }
 
         this.selectedAttacker = null
+        this.scene.hideActionOptions()
+
+        return true
+    }
+
+    guard(sprite) {
+        if (!sprite || sprite.isDead || sprite.hasActed) {
+            return false
+        }
+
+        sprite.guard = Math.round(sprite.hp / 2)
+        sprite.isGuarding = true
+        sprite.hasActed = true
+
+        console.log(
+            `${sprite.unit.typeId} is guarding`
+        )
+
+        console.log(
+            `${sprite.unit.typeId} Guard: ${sprite.guard}`
+        )
+
+        console.log(
+            `${sprite.unit.typeId} HP: ${sprite.hp}`
+        )
+
+        this.selectedUnit = null
+        this.scene.hideActionOptions()
 
         return true
     }
@@ -76,6 +129,11 @@ export default class CombatSystem {
             duration: 300
         })
         this.scene.turnSystem.checkBattleResult()
+    }
+
+    showActionOptions(sprite) {
+        this.scene.showAttackOptions(sprite)
+        this.scene.showGuardOption(sprite)
     }
 
 }

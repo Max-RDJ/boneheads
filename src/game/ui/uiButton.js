@@ -16,6 +16,7 @@ export class UIButton extends Phaser.GameObjects.Container {
             borderWidth = 3,
             backgroundColor = 0x329745,
             hoverBackgroundColor = backgroundColor,
+            disabledBackgroundColor = 0x666666,
             ...textStyle
         } = {
             ...style,
@@ -29,6 +30,7 @@ export class UIButton extends Phaser.GameObjects.Container {
         this.borderWidth = borderWidth
         this.backgroundColor = backgroundColor
         this.hoverBackgroundColor = hoverBackgroundColor
+        this.disabledBackgroundColor = disabledBackgroundColor
 
         this.text = scene.add.text(
             0,
@@ -36,6 +38,8 @@ export class UIButton extends Phaser.GameObjects.Container {
             label,
             textStyle
         ).setOrigin(0.5)
+
+        this.enabled = true
 
         const buttonHeight = height ?? this.text.height + 20
 
@@ -57,11 +61,21 @@ export class UIButton extends Phaser.GameObjects.Container {
         this.on('pointerdown', onClick)
 
         this.on('pointerover', () => {
-            this.drawBackground(this.hoverBackgroundColor, buttonHeight)
+            if (this.enabled) {
+                this.drawBackground(
+                    this.hoverBackgroundColor,
+                    buttonHeight
+                )
+            }
         })
 
         this.on('pointerout', () => {
-            this.drawBackground(this.backgroundColor, buttonHeight)
+            if (this.enabled) {
+                this.drawBackground(
+                    this.backgroundColor,
+                    buttonHeight
+                )
+            }
         })
     }
 
@@ -96,4 +110,25 @@ export class UIButton extends Phaser.GameObjects.Container {
         this.text.setText(text)
         return this
     }
+
+    setEnabled(enabled) {
+        this.enabled = enabled
+
+        if (enabled) {
+            this.setInteractive()
+            this.setAlpha(1)
+            this.drawBackground(
+                this.backgroundColor,
+                this.buttonHeight
+            )
+        } else {
+            this.disableInteractive()
+            this.setAlpha(1)
+            this.drawBackground(
+                this.disabledBackgroundColor,
+                this.buttonHeight
+            )
+        }
+    }
+
 }

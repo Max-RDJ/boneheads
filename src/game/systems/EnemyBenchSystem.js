@@ -114,11 +114,15 @@ export default class EnemyBenchSystem {
             textureKey
         )
 
+        const stats = getBoneheadStats(unit)
+
         sprite.unit = unit
-        sprite.hp = getBoneheadStats(unit).hp
         sprite.slotIndex = index
         sprite.location = 'bench'
         sprite.isDead = false
+        sprite.hasActed = false
+        sprite.hp = stats.hp
+        sprite.guard = stats.guard
 
         sprite.setDisplaySize(64, 64)
         sprite.setInteractive({
@@ -127,7 +131,7 @@ export default class EnemyBenchSystem {
 
         sprite.on('pointerdown', () => {
             const attacker =
-                this.scene.combatSystem.selectedAttacker
+                this.scene.combatSystem.selectedUnit
 
             if (!attacker) {
                 return

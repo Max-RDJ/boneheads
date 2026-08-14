@@ -2,6 +2,7 @@ import { BONEHEAD_DB } from '../data/boneheadDB'
 import { DEPTH } from '../config/depth'
 import { playerData } from '../state/playerData'
 import { startSpriteBlinking } from '../helpers/startSpriteBlinking'
+import { getBoneheadStats } from '../helpers/getBoneheadStats'
 
 
 const SLOT_SPACING = 100
@@ -68,10 +69,15 @@ export default class PlayerBenchSystem {
             textureKey
         )
 
+        const stats = getBoneheadStats(unit)
+
         sprite.unit = unit
         sprite.slotIndex = index
         sprite.location = 'bench'
         sprite.isDead = false
+        sprite.hasActed = false
+        sprite.hp = stats.hp
+        sprite.guard = stats.guard
 
         sprite.setDisplaySize(64, 64)
         sprite.setInteractive({ cursor: 'pointer' })
@@ -81,9 +87,17 @@ export default class PlayerBenchSystem {
         this.slots[index] = sprite
         this.sprites.push(sprite)
 
+
         this.setupDragging(sprite)
 
         startSpriteBlinking(this.scene, sprite)
+
+        sprite.on('pointerdown', () => {
+            if (sprite.isDead) {
+                return
+            }
+            this.scene.combatSystem.selectUnit(sprite)
+        })
     }
 
     setupDragging(sprite) {
@@ -98,6 +112,8 @@ export default class PlayerBenchSystem {
                 this.battleUnits.length < MAX_DEPLOYED
 
             this.scene.arena.showBattleZoneHighlight(canDeploy)
+
+            this.cursor = 'grab' // Doesn't work
 
             sprite.setDepth(DEPTH.dragging)
         })

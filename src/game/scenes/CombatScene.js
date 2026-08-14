@@ -34,6 +34,7 @@ export default class CombatScene extends Phaser.Scene {
 
         // UI
         this.createEndTurnButton()
+        this.actionButtons = []
 
         // Start combat
         this.turnSystem.start()
@@ -54,6 +55,8 @@ export default class CombatScene extends Phaser.Scene {
                 height: 75,
             }
         )
+
+        this.endTurnButton.setEnabled(false)
     }
 
     createBattleZone() {
@@ -90,6 +93,76 @@ export default class CombatScene extends Phaser.Scene {
 
         this.battleZoneLabel.setOrigin(0.5)
         this.battleZoneLabel.setAlpha(0.25)
+    }
+
+    showAttackOptions(unit) {
+        this.hideActionOptions()
+
+        const enemies =
+            this.enemyBench.getBattleUnits()
+
+        enemies.forEach(enemy => {
+
+            if (enemy.isDead) {
+                return
+            }
+
+            const button = this.add.text(
+                enemy.x,
+                enemy.y - 50,
+                '⚔',
+                {
+                    fontSize: '28px',
+                    color: '#ffffff'
+                }
+            )
+
+            button.setOrigin(0.5)
+
+            button.setInteractive({
+                cursor: 'pointer'
+            })
+
+            button.on('pointerdown', () => {
+                this.combatSystem.attack(
+                    unit,
+                    enemy
+                )
+            })
+
+            this.actionButtons.push(button)
+        })
+    }
+
+    showGuardOption(unit) {
+        const button = this.add.text(
+            unit.x,
+            unit.y + 50,
+            '🛡',
+            {
+                fontSize: '28px'
+            }
+        )
+
+        button.setOrigin(0.5)
+
+        button.setInteractive({
+            cursor: 'pointer'
+        })
+
+        button.on('pointerdown', () => {
+            this.combatSystem.guard(unit)
+        })
+
+        this.actionButtons.push(button)
+    }
+
+    hideActionOptions() {
+        this.actionButtons.forEach(button => {
+            button.destroy()
+        })
+
+        this.actionButtons = []
     }
 
 }
