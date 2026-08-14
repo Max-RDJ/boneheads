@@ -32,8 +32,12 @@ export default class ShopScene extends Phaser.Scene {
         super('ShopScene')
     }
 
-    create() {
+    create(data) {
         this.tooltip = new Tooltip(this)
+
+        if (data.refreshShop) {
+            this.refreshShop()
+        }
 
         this.coinCounter = new CoinCounter(
             this,
@@ -505,6 +509,12 @@ export default class ShopScene extends Phaser.Scene {
         const rerollCount = playerData.rerollCount || 0
 
         return Math.ceil(baseCost + (rerollCount * costMultiplier))
+    }
+
+    refreshShop() {
+        playerData.shop.boneheads = this.generateBoneheadStock()
+        playerData.shop.boosters = this.generateBoosterStock()
+        playerData.shop.paints = this.generatePaintStock()
     }
 
 }

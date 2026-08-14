@@ -5,6 +5,8 @@ import EnemyBenchSystem from '../systems/EnemyBenchSystem'
 import CombatSystem from '../systems/CombatSystem'
 import TurnSystem from '../systems/TurnSystem'
 import ArenaSystem from '../systems/ArenaSystem'
+import { VictoryScreen } from '../ui/VictoryScreen'
+import { advanceEnemy } from '../systems/ProgressSystem'
 
 import { UIButton } from '../ui/uiButton'
 import { UI_STYLES } from '../ui/styles'
@@ -378,6 +380,21 @@ export default class CombatScene extends Phaser.Scene {
 
     update() {
         this.updateHealthBars()
+    }
+
+    showVictoryScreen(reward) {
+        this.endTurnButton.setEnabled(false)
+
+        this.victoryScreen = new VictoryScreen(
+            this,
+            reward,
+            () => {
+                advanceEnemy()
+                this.scene.start('ShopScene', {
+                    refreshShop: true
+                })
+            }
+        )
     }
 
 }

@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
-import { advanceEnemy } from './ProgressSystem'
+import { advanceEnemy, getCurrentEnemy } from './ProgressSystem'
+import { enemies } from '../data/enemyDB'
 
 
 export default class TurnSystem {
@@ -10,6 +11,7 @@ export default class TurnSystem {
         this.turn = 1
         this.phase = 'player_deployment'
         this.isPlayerTurn = true
+        this.battleOver = false
     }
 
     start() {
@@ -152,6 +154,10 @@ export default class TurnSystem {
     }
 
     checkBattleResult() {
+        if (this.battleOver) {
+            return
+        }
+
         const enemyAlive =
             this.scene.enemyBench.getLivingUnits().length > 0
 
@@ -159,17 +165,24 @@ export default class TurnSystem {
             this.scene.playerBench.getLivingUnits().length > 0
 
         if (!enemyAlive) {
+            this.battleOver = true
             this.playerVictory()
             return
         }
 
         if (!playerAlive) {
+            this.battleOver = true
             this.playerLoss()
         }
     }
 
     playerVictory() {
-        advanceEnemy()
+        const enemy = getCurrentEnemy()
+        const reward = enemy.reward
+        
+        setTimeout(() => {
+            this.scene.showVictoryScreen(reward)
+        }, 1000);
     }
 
     playerLoss() {

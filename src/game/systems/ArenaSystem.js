@@ -34,7 +34,7 @@ const BATTLE_FORMATION = {
     },
 
     player: {
-        y: 170
+        y: 180
     }
 }
 
