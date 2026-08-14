@@ -35,6 +35,7 @@ export default class CombatScene extends Phaser.Scene {
         // UI
         this.createEndTurnButton()
         this.actionButtons = []
+        this.createHealthBars()
 
         // Start combat
         this.turnSystem.start()
@@ -163,6 +164,106 @@ export default class CombatScene extends Phaser.Scene {
         })
 
         this.actionButtons = []
+    }
+
+    createHealthBars() {
+        this.healthBars = new Map()
+
+        const allUnits = [
+            ...this.playerBench.sprites,
+            ...this.enemyBench.sprites
+        ]
+
+        allUnits.forEach(sprite => {
+            const bars = {
+                hp: this.add.graphics(),
+                guard: this.add.graphics()
+            }
+
+            bars.hp.setDepth(100)
+            bars.guard.setDepth(100)
+
+            this.healthBars.set(sprite, bars)
+        })
+    }
+
+    updateHealthBars() {
+        if (!this.healthBars) {
+            return
+        }
+
+        this.healthBars.forEach((bars, sprite) => {
+
+            bars.hp.clear()
+            bars.guard.clear()
+
+            if (sprite.isDead) {
+                return
+            }
+
+            const width = 64
+            const height = 6
+
+            const x = sprite.x - width / 2
+            const hpY = sprite.y + 36
+            const guardY = sprite.y + 44
+
+            // HP background
+            bars.hp.fillStyle(0x333333)
+            bars.hp.fillRect(
+                x,
+                hpY,
+                width,
+                height
+            )
+
+            // HP
+            const hpRatio =
+                Math.max(
+                    0,
+                    Math.min(1, sprite.hp / sprite.maxHp)
+                )
+
+            bars.hp.fillStyle(0x44aa44)
+            bars.hp.fillRect(
+                x,
+                hpY,
+                width * hpRatio,
+                height
+            )
+
+            // Guard
+            if (sprite.guard > 0) {
+
+                const guardRatio =
+                    Math.max(
+                        0,
+                        Math.min(1, sprite.guard / sprite.maxGuard)
+                    )
+
+                // Guard background
+                bars.guard.fillStyle(0x333333)
+                bars.guard.fillRect(
+                    x,
+                    guardY,
+                    width,
+                    height
+                )
+
+                // Guard amount
+                bars.guard.fillStyle(0xaaaaaa)
+                bars.guard.fillRect(
+                    x,
+                    guardY,
+                    width * guardRatio,
+                    height
+                )
+            }
+        })
+    }
+
+    update() {
+        this.updateHealthBars()
     }
 
 }

@@ -97,7 +97,7 @@ export default class CombatSystem {
             return false
         }
 
-        sprite.guard = Math.round(sprite.hp / 2)
+        sprite.guard = sprite.maxGuard
         sprite.isGuarding = true
         sprite.hasActed = true
 

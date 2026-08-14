@@ -76,8 +76,10 @@ export default class PlayerBenchSystem {
         sprite.location = 'bench'
         sprite.isDead = false
         sprite.hasActed = false
+        sprite.maxHp = stats.hp
         sprite.hp = stats.hp
-        sprite.guard = stats.guard
+        sprite.maxGuard = Math.round(stats.hp / 2)
+        sprite.guard = 0
 
         sprite.setDisplaySize(64, 64)
         sprite.setInteractive({ cursor: 'pointer' })
