@@ -1,5 +1,4 @@
 import { getBoneheadStats } from '../helpers/getBoneheadStats'
-import { showAttackOptions, showGuardOption } from '../scenes/CombatScene'
 
 
 export default class CombatSystem {

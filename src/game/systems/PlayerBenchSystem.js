@@ -90,6 +90,8 @@ export default class PlayerBenchSystem {
 
         this.scene.input.setDraggable(sprite)
 
+        sprite.on('pointerdown', () => { if (sprite.isDead) { return } this.scene.combatSystem.selectUnit(sprite) })
+
         this.slots[index] = sprite
         this.sprites.push(sprite)
 
@@ -128,8 +130,10 @@ export default class PlayerBenchSystem {
 
     setupDragging(sprite) {
         sprite.on('dragstart', () => {
-
-            if (sprite.isDead) {
+            if (
+                sprite.isDead ||
+                this.scene.turnSystem.phase !== 'player_deployment'
+            ) {
                 return
             }
 
@@ -219,6 +223,16 @@ export default class PlayerBenchSystem {
         this.moveToBattle(sprite)
     }
 
+    setDeploymentEnabled(enabled) {
+        this.sprites.forEach(sprite => {
+            if (sprite.isDead) {
+                return
+            }
+
+            this.scene.input.setDraggable(sprite, enabled)
+        })
+    }
+    
     getAvailableBattleSlot() {
         for (let i = 0; i < MAX_DEPLOYED; i++) {
 

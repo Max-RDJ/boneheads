@@ -27,7 +27,6 @@ export default class CombatScene extends Phaser.Scene {
 
         // Systems
         this.arena = new ArenaSystem(this)
-        this.boneheadTooltip = new Tooltip(this)
 
         this.playerBench = new PlayerBenchSystem(
             this,
@@ -68,6 +67,8 @@ export default class CombatScene extends Phaser.Scene {
             `End turn`,
             UI_STYLES.button,
             () => {
+                this.playerBench.setDeploymentEnabled(false)
+
                 this.turnSystem.endPlayerTurn()
             },
             {
@@ -116,17 +117,14 @@ export default class CombatScene extends Phaser.Scene {
                 return
             }
 
-            const button = this.add.text(
+            const button = this.add.image(
                 enemy.x,
                 enemy.y - 50,
-                '⚔',
-                {
-                    fontSize: '28px',
-                    color: '#ffffff'
-                }
+                'action_icon_swords'
             )
 
-            button.setOrigin(0.5)
+            button.setDisplaySize(32, 32)
+            button.setDepth(1001)
 
             button.setInteractive({
                 cursor: 'pointer'
@@ -144,16 +142,16 @@ export default class CombatScene extends Phaser.Scene {
     }
 
     showGuardOption(unit) {
-        const button = this.add.text(
+        const button = this.add.image(
             unit.x,
             unit.y + 50,
-            '🛡',
+            'action_icon_shield',
             {
                 fontSize: '28px'
             }
         )
 
-        button.setOrigin(0.5)
+        button.setDisplaySize(32, 32)
         button.setDepth(1001)
 
         button.setInteractive({

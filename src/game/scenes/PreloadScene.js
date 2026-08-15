@@ -71,6 +71,16 @@ export default class PreloadScene extends Phaser.Scene {
             '/assets/ui/bag.png'
         )
 
+        this.load.image(
+            'action_icon_swords',
+            'assets/ui/action_icon_swords.png'
+        )
+
+        this.load.image(
+            'action_icon_shield',
+            'assets/ui/action_icon_shield.png'
+        )
+
     }
 
     create() {
