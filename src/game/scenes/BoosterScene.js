@@ -113,12 +113,11 @@ export default class BoosterScene extends Phaser.Scene {
             const capacity = BAG_SIZES[playerData.bag.size].capacity
 
             if (playerData.bag.contents.length < capacity) {
-                const purchasedBonehead = createBoneheadInstance(bonehead.id)
+                const purchasedBonehead = createBoneheadInstance(bonehead.typeid, bonehead.colour)
 
                 playerData.bag.contents.push({
                     ...purchasedBonehead,
                     instanceId: generateInstanceId(),
-                    colour: bonehead.colour
                 })
             }
         })

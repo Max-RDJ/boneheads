@@ -1,7 +1,8 @@
 import { enemies } from '../data/enemyDB'
 
 export const progressData = {
-    currentEnemy: 0
+    currentEnemy: 0,
+    currentTier: 0
 }
 
 export function getCurrentEnemy() {
@@ -26,4 +27,13 @@ export function advanceEnemy() {
     progressData.currentEnemy++
 
     return true
+}
+
+export function checkTier() {
+    const tier = progressData.currentTier
+
+    if (progressData.currentEnemy.boss) {
+        tier++
+    }
+
 }

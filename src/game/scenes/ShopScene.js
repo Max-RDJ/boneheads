@@ -298,6 +298,11 @@ export default class ShopScene extends Phaser.Scene {
             return
         }
 
+        if (checkBagFull()) {
+            this.boosterPanel.errorOverlay.showMessage('Bag full!')
+            return
+        }
+
         playerData.coins -= booster.price
 
         const shopBooster = playerData.shop.boosters.find(
@@ -463,7 +468,7 @@ export default class ShopScene extends Phaser.Scene {
                 alert('You must have at least one Bonehead in your active party to start a battle!')
                 return
             }
-            this.scene.start('CombatScene')
+            this.scene.start('RoundSelectionScene')
         },
         {
             width: 200

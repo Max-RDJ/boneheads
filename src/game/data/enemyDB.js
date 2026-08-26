@@ -19,7 +19,8 @@ export const enemies =[
         ],
         enemyTier: 1,
         reward: 3,
-        quote: "Wanna pway?"
+        quote: "Wanna pway?",
+        boss: false
     },
     {
         name: "Jimmy",
@@ -39,7 +40,8 @@ export const enemies =[
         ],
         enemyTier: 1,
         reward: 3,
-        quote: "At least I'm not Timmy."
+        quote: "At least I'm not Timmy.",
+        boss: false
     },
     {
         name: "Bimmy",
@@ -59,6 +61,7 @@ export const enemies =[
         ],
         enemyTier: 1,
         reward: 8,
-        quote: "I'm bimmyyyyy!"
+        quote: "I'm bimmyyyyy!",
+        boss: true
     },
 ]

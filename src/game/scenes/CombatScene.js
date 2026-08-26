@@ -6,7 +6,7 @@ import CombatSystem from '../systems/CombatSystem'
 import TurnSystem from '../systems/TurnSystem'
 import ArenaSystem from '../systems/ArenaSystem'
 import { VictoryScreen } from '../ui/VictoryScreen'
-import { advanceEnemy } from '../systems/ProgressSystem'
+import { advanceEnemy, checkTier } from '../systems/ProgressSystem'
 
 import { Tooltip } from '../ui/Tooltip'
 import { UIButton } from '../ui/uiButton'
@@ -405,6 +405,7 @@ export default class CombatScene extends Phaser.Scene {
             reward,
             () => {
                 advanceEnemy()
+                checkTier()
                 this.scene.start('ShopScene', {
                     refreshShop: true
                 })

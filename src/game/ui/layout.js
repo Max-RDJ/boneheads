@@ -99,3 +99,11 @@ export const INVENTORY_LAYOUT = {
         spacing: 100
     }
 }
+
+export const ROUND_SELECTION_LAYOUT = {
+    cards: {
+        y: 300,
+        startX: 150,
+        spacing: 250
+    }
+}

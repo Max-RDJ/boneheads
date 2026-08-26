@@ -24,7 +24,7 @@ export function getRandomBoneheadColour() {
     return 'blue'
 }
 
-export function createBoneheadInstance(id) {
+export function createBoneheadInstance(id, colour) {
     const bonehead = BONEHEAD_DB[id]
 
     return {
