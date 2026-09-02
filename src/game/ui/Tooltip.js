@@ -165,6 +165,7 @@ export class Tooltip extends Phaser.GameObjects.Container {
 
         const offset = 10
 
+        // Position this tooltip to the right of the first tooltip
         let x =
             tooltip.x +
             tooltip.tooltipWidth +
@@ -175,13 +176,25 @@ export class Tooltip extends Phaser.GameObjects.Container {
         const screenWidth = this.scene.scale.width
         const screenHeight = this.scene.scale.height
 
+        // If the pair would extend beyond the right edge,
+        // move BOTH tooltips to the left.
+        const pairWidth =
+            tooltip.tooltipWidth +
+            offset +
+            this.tooltipWidth
+
         if (x + this.tooltipWidth > screenWidth) {
-            x =
-                tooltip.x -
-                this.tooltipWidth -
-                offset
+            tooltip.x = screenWidth - pairWidth
+            x = tooltip.x + tooltip.tooltipWidth + offset
         }
 
+        // Keep the pair inside the left edge
+        if (tooltip.x < 0) {
+            tooltip.x = 0
+            x = tooltip.tooltipWidth + offset
+        }
+
+        // Keep both tooltips vertically on screen
         y = Phaser.Math.Clamp(
             y,
             0,
