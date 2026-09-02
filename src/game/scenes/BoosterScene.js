@@ -56,6 +56,7 @@ export default class BoosterScene extends Phaser.Scene {
         ).setOrigin(0.5)
 
         this.tooltip = new Tooltip(this)
+        this.paintTooltip = new Tooltip(this)
 
         this.createChoices()
     }
@@ -113,7 +114,7 @@ export default class BoosterScene extends Phaser.Scene {
             const capacity = BAG_SIZES[playerData.bag.size].capacity
 
             if (playerData.bag.contents.length < capacity) {
-                const purchasedBonehead = createBoneheadInstance(bonehead.typeid, bonehead.colour)
+                const purchasedBonehead = createBoneheadInstance(bonehead.typeId, bonehead.colour)
 
                 playerData.bag.contents.push({
                     ...purchasedBonehead,
