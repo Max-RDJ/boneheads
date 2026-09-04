@@ -3,7 +3,7 @@ import Phaser from 'phaser'
 
 export class BagIcon extends Phaser.GameObjects.Container {
 
-    constructor(scene, x, y, tooltip) {
+    constructor(scene, x, y, tooltip, targetScene = 'InventoryScene') {
 
         super(scene, x, y)
 
@@ -11,6 +11,7 @@ export class BagIcon extends Phaser.GameObjects.Container {
 
         this.gameScene = scene
         this.tooltip = tooltip
+        this.targetScene = targetScene
 
         this.image = scene.add.image(
             80,
@@ -36,7 +37,17 @@ export class BagIcon extends Phaser.GameObjects.Container {
         })
 
         this.image.on('pointerdown', () => {
-            this.gameScene.scene.start('InventoryScene')
+            this.gameScene.scene.pause(
+                this.gameScene.scene.key
+            )
+
+            this.gameScene.scene.launch(
+                this.targetScene
+            )
+
+            this.gameScene.scene.bringToTop(
+                this.targetScene
+            )
         })
 
         this.add(this.image)

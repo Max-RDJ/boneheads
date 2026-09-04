@@ -8,6 +8,7 @@ import ArenaSystem from '../systems/ArenaSystem'
 import { VictoryScreen } from '../ui/VictoryScreen'
 import { advanceEnemy, checkTier } from '../systems/ProgressSystem'
 import { endRound } from '../helpers/endRound'
+import { BagIcon } from '../ui/BagIcon'
 
 import { Tooltip } from '../ui/Tooltip'
 import { UIButton } from '../ui/uiButton'
@@ -23,6 +24,7 @@ export default class CombatScene extends Phaser.Scene {
     create() {
 
         // Tooltips
+        this.tooltip = new Tooltip(this)
         this.boneheadTooltip = new Tooltip(this)
         this.paintTooltip = new Tooltip(this)
 
@@ -39,6 +41,14 @@ export default class CombatScene extends Phaser.Scene {
             this,
             this.boneheadTooltip,
             this.paintTooltip
+        )
+
+        this.bagIcon  = new BagIcon(
+            this,
+            600,
+            400,
+            this.tooltip,
+            'CombatInventoryScene'
         )
 
         this.combatSystem = new CombatSystem(this)

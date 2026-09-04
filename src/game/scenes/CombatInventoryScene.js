@@ -11,23 +11,17 @@ import { Panel } from '../ui/Panel'
 import { Tooltip } from '../ui/Tooltip'
 import { UIButton } from '../ui/uiButton'
 import { UI_STYLES } from '../ui/styles'
-import { PaintModeIndicator } from '../ui/PaintModeIndicator'
-import { PAINT_EFFECTS } from '../data/paintEffects'
 
 
-export default class InventoryScene extends Phaser.Scene {
+export default class CombatInventoryScene extends Phaser.Scene {
 
     constructor() {
-        super('InventoryScene')
+        super('CombatInventoryScene')
     }
 
     create() {
 
         this.createOverlay()
-
-        this.paintMode = false
-        this.selectedPaint = null
-        this.paintModeIndicator = null
 
         this.tooltip = new Tooltip(this)
         this.paintTooltip = new Tooltip(this)
@@ -48,15 +42,6 @@ export default class InventoryScene extends Phaser.Scene {
         this.createBoneheadSection()
         this.createPaintSection()
         this.createBackButton()
-
-        this.paintMode = false
-        this.selectedPaint = null
-
-        this.input.on('pointerdown', this.handlePointerDown, this)
-
-        this.game.canvas.addEventListener('contextmenu', (event) => {
-            event.preventDefault()
-        })
     }
 
     createOverlay() {
@@ -80,7 +65,8 @@ export default class InventoryScene extends Phaser.Scene {
             'Back',
             UI_STYLES.buttonSmall,
             () => {
-                this.scene.start('ShopScene')
+                this.scene.stop('CombatInventoryScene')
+                this.scene.resume('CombatScene')
             },
         )
     }
@@ -110,11 +96,6 @@ export default class InventoryScene extends Phaser.Scene {
         })
 
         const columns = 4
-        const spacingX = 100
-        const spacingY = 100
-
-        const startX = 100
-        const startY = 400
 
         if (paints.length > 0) {
 
@@ -139,7 +120,7 @@ export default class InventoryScene extends Phaser.Scene {
                     x,
                     y,
                     paint,
-                    this.selectPaint.bind(this),
+                    null,
                     this.tooltip,
                     { showPrice: false }
                 )
@@ -154,13 +135,6 @@ export default class InventoryScene extends Phaser.Scene {
                 UI_STYLES.bodyLarge
             ).setOrigin(0.5)
         }
-    }
-
-    selectPaint(paint) {
-        this.paintMode = true
-        this.selectedPaint = paint
-
-        this.enterPaintMode()
     }
 
     createBoneheadSection() {
@@ -180,11 +154,6 @@ export default class InventoryScene extends Phaser.Scene {
         const boneheads = playerData.bag.contents
 
         const columns = 5
-        const spacingX = 140
-        const spacingY = 140
-
-        const startX = 120
-        const startY = 150
 
         if (boneheads.length > 0) {
 
@@ -209,7 +178,7 @@ export default class InventoryScene extends Phaser.Scene {
                     x,
                     y,
                     bonehead,
-                    this.handleBoneheadClick.bind(this),
+                    null,
                     this.tooltip,
                     this.paintTooltip,
                     { showPrice: false }
@@ -226,82 +195,6 @@ export default class InventoryScene extends Phaser.Scene {
                 "It's looking a little lonely in here...",
                 UI_STYLES.bodyLarge
             ).setOrigin(0.5)
-        }
-    }
-
-    
-    // Painting
-    handleBoneheadClick(bonehead) {
-        if (!this.paintMode) {
-            return
-        }
-
-        this.paintBonehead(
-            bonehead,
-            this.selectedPaint
-        )
-    }
-
-    paintBonehead(bonehead, paint) {
-        const ownedBonehead = playerData.bag.contents.find(
-            item => item.instanceId === bonehead.instanceId
-        )
-
-        if (!ownedBonehead) {
-            return
-        }
-
-        ownedBonehead.colour = paint.colour
-
-        const paintEffect = PAINT_EFFECTS[paint.colour]
-
-        ownedBonehead.roundsRemaining =
-            paintEffect?.roundsRemaining ?? null
-
-        const paintIndex = playerData.paint.findIndex(
-            item => item.instanceId === paint.instanceId
-        )
-
-        if (paintIndex !== -1) {
-            playerData.paint.splice(paintIndex, 1)
-        }
-
-        this.exitPaintMode()
-        this.refreshInventory()
-    }
-
-
-    enterPaintMode() {
-        this.backButton.disableInteractive()
-
-        const paint = this.selectedPaint
-
-        if (!this.paintModeIndicator) {
-            this.paintModeIndicator = new PaintModeIndicator(
-                this,
-                paint.colour
-            )
-        } else {
-            this.paintModeIndicator.setColour(paint.colour)
-        }
-
-        this.paintModeIndicator.show()
-        this.input.setDefaultCursor('none')
-    }
-
-    exitPaintMode() {
-
-        this.paintMode = false
-        this.selectedPaint = null
-
-        this.backButton.setInteractive()
-        this.paintModeIndicator.hide()
-        this.input.setDefaultCursor('default')
-    }
-
-    handlePointerDown(pointer) {
-        if (pointer.rightButtonDown() && this.paintMode) {
-            this.exitPaintMode()
         }
     }
 

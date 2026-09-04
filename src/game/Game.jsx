@@ -5,6 +5,7 @@ import PreloadScene from './scenes/PreloadScene'
 
 import BoosterScene from './scenes/BoosterScene'
 import CombatScene from './scenes/CombatScene'
+import CombatInventoryScene from './scenes/CombatInventoryScene'
 import InventoryScene from './scenes/InventoryScene'
 import RoundSelectionScene from './scenes/RoundSelectionScene'
 import ShopScene from './scenes/ShopScene'
@@ -23,6 +24,7 @@ function Game() {
                 PreloadScene,
                 BoosterScene,
                 CombatScene,
+                CombatInventoryScene,
                 InventoryScene,
                 RoundSelectionScene,
                 ShopScene,
