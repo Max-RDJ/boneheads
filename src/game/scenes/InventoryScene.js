@@ -1,6 +1,5 @@
 import Phaser from 'phaser'
 
-import { BONEHEAD_DB } from '../data/boneheadDB'
 import { PAINT_DB } from '../data/paintDB'
 import { playerData } from '../state/playerData'
 
@@ -13,7 +12,7 @@ import { Tooltip } from '../ui/Tooltip'
 import { UIButton } from '../ui/uiButton'
 import { UI_STYLES } from '../ui/styles'
 import { PaintModeIndicator } from '../ui/PaintModeIndicator'
-import { getBoneheadStats } from '../helpers/getBoneheadStats'
+import { PAINT_EFFECTS } from '../data/paintEffects'
 
 
 export default class InventoryScene extends Phaser.Scene {
@@ -238,6 +237,11 @@ export default class InventoryScene extends Phaser.Scene {
         }
 
         ownedBonehead.colour = paint.colour
+
+        const paintEffect = PAINT_EFFECTS[paint.colour]
+
+        ownedBonehead.roundsRemaining =
+            paintEffect?.roundsRemaining ?? null
 
         const paintIndex = playerData.paint.findIndex(
             item => item.instanceId === paint.instanceId

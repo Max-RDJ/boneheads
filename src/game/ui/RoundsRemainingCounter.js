@@ -13,7 +13,7 @@ export class RoundsRemainingCounter extends Phaser.GameObjects.Container {
         this.bonehead = bonehead
 
         this.offsetX = 300
-        this.offsetY = -300
+        this.offsetY = -350
 
         this.radius = 13
 
