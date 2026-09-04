@@ -129,14 +129,8 @@ export default class BoosterScene extends Phaser.Scene {
             return
         }
 
-        const newBonehead =
-            createBoneheadInstance(
-                bonehead.typeId,
-                bonehead.colour
-            )
-
         playerData.bag.contents.push({
-            ...newBonehead,
+            ...bonehead,
             instanceId: generateInstanceId()
         })
 
@@ -146,8 +140,9 @@ export default class BoosterScene extends Phaser.Scene {
             )
 
         if (card) {
-            card.destroy()
             this.tooltip.hide()
+            this.tooltip.hide()
+            card.destroy()
         }
 
         if (
