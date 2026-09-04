@@ -3,4 +3,7 @@ export const PAINT_EFFECTS = {
         attackMultiplier: 2,
         roundsRemaining: 3
     },
+    green: {
+        repairCostMultiplier: 0,
+    }
 }

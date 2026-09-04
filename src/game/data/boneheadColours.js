@@ -10,7 +10,7 @@ export const BONEHEAD_COLOURS = {
         rarity: 'uncommon',
         weight: 20,
         title: "Green",
-        description: "green desc"
+        description: "Bonehead is free to repair."
     },
 
     red: {

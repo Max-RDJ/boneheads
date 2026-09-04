@@ -5,6 +5,8 @@ import { UI_STYLES } from './styles'
 import { BONEHEAD_COLOURS } from '../data/boneheadColours'
 import { BONEHEAD_DB } from '../data/boneheadDB'
 import { getBoneheadStats } from '../helpers/getBoneheadStats'
+import { RoundsRemainingCounter } from '../ui/RoundsRemainingCounter'
+
 
 
 export class BoneheadCard extends Phaser.GameObjects.Container {
@@ -35,6 +37,15 @@ export class BoneheadCard extends Phaser.GameObjects.Container {
         }
 
         this.createImage(bonehead)
+
+        if (bonehead.roundsRemaining != null) {
+            this.roundsRemainingCounter =
+                new RoundsRemainingCounter(
+                    this.image,
+                    bonehead.roundsRemaining,
+                    COLOURS[bonehead.colour]
+                )
+        }
 
         this.setSize(180, 120)
 

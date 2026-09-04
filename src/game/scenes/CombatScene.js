@@ -7,6 +7,7 @@ import TurnSystem from '../systems/TurnSystem'
 import ArenaSystem from '../systems/ArenaSystem'
 import { VictoryScreen } from '../ui/VictoryScreen'
 import { advanceEnemy, checkTier } from '../systems/ProgressSystem'
+import { endRound } from '../helpers/endRound'
 
 import { Tooltip } from '../ui/Tooltip'
 import { UIButton } from '../ui/uiButton'
@@ -406,6 +407,7 @@ export default class CombatScene extends Phaser.Scene {
             () => {
                 advanceEnemy()
                 checkTier()
+                endRound()
                 this.scene.start('ShopScene', {
                     refreshShop: true
                 })

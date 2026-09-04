@@ -1,6 +1,8 @@
-import { countdownBoneheadRoundsRemaining } from "./countdownBoneheadRoundsRemaining"
 import { playerData } from "../state/playerData"
+import { countdownBoneheadRoundsRemaining } from "./countdownBoneheadRoundsRemaining"
 
-playerData.bag.contents.forEach(bonehead => {
-    countdownBoneheadRoundsRemaining(bonehead)
-})
+export function endRound() {
+    playerData.bag.contents.forEach(bonehead => {
+        countdownBoneheadRoundsRemaining(bonehead)
+    })
+}

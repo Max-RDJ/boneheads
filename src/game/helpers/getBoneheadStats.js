@@ -20,9 +20,5 @@ export function getBoneheadStats(bonehead) {
         stats.attack *= paintEffect.attackMultiplier
     }
 
-    if (paintEffect.roundsRemaining) {
-        stats.roundsRemaining = paintEffect.roundsRemaining
-    }
-
     return stats
 }

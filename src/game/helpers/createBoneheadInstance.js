@@ -1,5 +1,6 @@
 import { BONEHEAD_COLOURS } from "../data/boneheadColours"
 import { BONEHEAD_DB } from "../data/boneheadDB"
+import { PAINT_EFFECTS } from "../data/paintEffects"
 
 export function getRandomBoneheadColour() {
 
@@ -25,15 +26,25 @@ export function getRandomBoneheadColour() {
 }
 
 export function createBoneheadInstance(id, colour) {
+
     const bonehead = BONEHEAD_DB[id]
+
+    const selectedColour =
+        colour ?? getRandomBoneheadColour()
+
+    const paintEffect =
+        PAINT_EFFECTS[selectedColour]
 
     return {
         typeId: id,
-        colour: getRandomBoneheadColour(),
+        colour: selectedColour,
         attack: bonehead.stats.attack,
         maxHp: bonehead.stats.hp,
         currentHp: bonehead.stats.hp,
         maxGuard: Math.round(bonehead.stats.hp / 2),
-        currentGuard: 0
+        currentGuard: 0,
+
+        roundsRemaining:
+            paintEffect?.roundsRemaining ?? null
     }
 }

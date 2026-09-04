@@ -5,6 +5,7 @@ import { startSpriteBlinking } from '../helpers/startSpriteBlinking'
 import { getBoneheadStats } from '../helpers/getBoneheadStats'
 import { COLOURS } from '../ui/ColourMap'
 import { BONEHEAD_COLOURS } from '../data/boneheadColours'
+import { RoundsRemainingCounter } from '../ui/RoundsRemainingCounter'
 
 
 const SLOT_SPACING = 100
@@ -84,6 +85,15 @@ export default class PlayerBenchSystem {
         sprite.hp = stats.hp
         sprite.maxGuard = Math.round(stats.hp / 2)
         sprite.guard = 0
+
+        if (unit.roundsRemaining != null) {
+            sprite.roundsRemainingCounter =
+                new RoundsRemainingCounter(
+                    sprite,
+                    unit.roundsRemaining,
+                    COLOURS[unit.colour]
+                )
+        }
 
         sprite.setDisplaySize(64, 64)
         sprite.setInteractive({ cursor: 'pointer' })

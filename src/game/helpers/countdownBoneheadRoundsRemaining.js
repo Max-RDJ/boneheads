@@ -1,17 +1,20 @@
-import { playerData } from "../state/playerData";
+import { playerData } from "../state/playerData"
 
 export function countdownBoneheadRoundsRemaining(bonehead) {
 
-    if (!bonehead.paintEffects?.roundsRemaining) {
+    if (bonehead.roundsRemaining == null) {
         return
     }
 
-    bonehead.paintEffects.roundsRemaining--
+    bonehead.roundsRemaining--
 
-    if (bonehead.paintEffects.roundsRemaining <= 0) {
-        const index = playerData.bag.contents.findIndex(
-            item => item.instanceId === bonehead.instanceId
-        )
+    if (bonehead.roundsRemaining <= 0) {
+
+        const index =
+            playerData.bag.contents.findIndex(
+                item =>
+                    item.instanceId === bonehead.instanceId
+            )
 
         if (index !== -1) {
             playerData.bag.contents.splice(index, 1)
