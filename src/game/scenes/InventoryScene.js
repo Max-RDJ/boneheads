@@ -21,6 +21,10 @@ export default class InventoryScene extends Phaser.Scene {
         super('InventoryScene')
     }
 
+    init(data) {
+        this.returnScene = data.returnScene || 'ShopScene'
+    }
+
     create() {
 
         this.createOverlay()
@@ -80,7 +84,8 @@ export default class InventoryScene extends Phaser.Scene {
             'Back',
             UI_STYLES.buttonSmall,
             () => {
-                this.scene.start('ShopScene')
+                this.scene.stop('InventoryScene')
+                this.scene.resume(this.returnScene)
             },
         )
     }

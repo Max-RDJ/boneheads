@@ -66,7 +66,7 @@ export default class CombatInventoryScene extends Phaser.Scene {
             UI_STYLES.buttonSmall,
             () => {
                 this.scene.stop('CombatInventoryScene')
-                this.scene.resume('CombatScene')
+                this.scene.resume(this.returnScene)
             },
         )
     }

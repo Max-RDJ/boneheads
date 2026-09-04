@@ -37,12 +37,20 @@ export class BagIcon extends Phaser.GameObjects.Container {
         })
 
         this.image.on('pointerdown', () => {
-            this.gameScene.scene.pause(
+            this.tooltip.hide()
+
+            const returnScene =
                 this.gameScene.scene.key
+
+            this.gameScene.scene.pause(
+                returnScene
             )
 
             this.gameScene.scene.launch(
-                this.targetScene
+                this.targetScene,
+                {
+                    returnScene
+                }
             )
 
             this.gameScene.scene.bringToTop(

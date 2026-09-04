@@ -10,6 +10,7 @@ import { CoinCounter } from '../ui/CoinCounter'
 import { Tooltip } from '../ui/Tooltip'
 import { UIButton } from '../ui/uiButton'
 import { UI_STYLES } from '../ui/styles'
+import { BagIcon } from '../ui/BagIcon'
 
 import { createBoneheadInstance } from '../helpers/createBoneheadInstance'
 import { generateInstanceId } from '../helpers/generateInstanceId'
@@ -58,6 +59,14 @@ export default class BoosterScene extends Phaser.Scene {
 
         this.createChoices()
         this.createSkipButton()
+
+        this.bagIcon  = new BagIcon(
+            this,
+            600,
+            400,
+            this.tooltip,
+            'InventoryScene'
+        )
     }
 
     createChoices() {
@@ -138,6 +147,7 @@ export default class BoosterScene extends Phaser.Scene {
 
         if (card) {
             card.destroy()
+            this.tooltip.hide()
         }
 
         if (
