@@ -7,8 +7,6 @@ import { playerData } from '../state/playerData'
 
 import { BoneheadCard } from '../ui/BoneheadCard'
 import { CoinCounter } from '../ui/CoinCounter'
-import { Panel } from '../ui/Panel'
-import { SHOP_LAYOUT } from '../ui/layout'
 import { Tooltip } from '../ui/Tooltip'
 import { UIButton } from '../ui/uiButton'
 import { UI_STYLES } from '../ui/styles'
@@ -51,7 +49,7 @@ export default class BoosterScene extends Phaser.Scene {
         this.add.text(
             400,
             100,
-            'These Boneheads will be added to your bag',
+            'Choose Boneheads to add to your bag',
             UI_STYLES.subtitle
         ).setOrigin(0.5)
 
@@ -59,12 +57,16 @@ export default class BoosterScene extends Phaser.Scene {
         this.paintTooltip = new Tooltip(this)
 
         this.createChoices()
+        this.createSkipButton()
     }
 
     createChoices() {
+
         this.boosterBoneheads = this.getRandomBoneheads(
             this.booster.contentsCount
         )
+
+        this.boneheadCards = []
 
         const spacing = 180
 
@@ -81,22 +83,23 @@ export default class BoosterScene extends Phaser.Scene {
             const x =
                 startX + index * spacing
 
-            new BoneheadCard(
+            const card = new BoneheadCard(
                 this,
                 x,
                 y,
                 bonehead,
-                null,
+                this.addBonehead.bind(this),
                 this.tooltip,
                 this.paintTooltip,
                 { showPrice: false }
             )
-        })
 
-        this.createProceedButton()
+            this.boneheadCards.push(card)
+        })
     }
 
     getRandomBoneheads(amount) {
+
         const ids = Object.keys(BONEHEAD_DB)
 
         const shuffled = Phaser.Utils.Array.Shuffle(
@@ -108,33 +111,52 @@ export default class BoosterScene extends Phaser.Scene {
             .map(id => createBoneheadInstance(id))
     }
 
-    proceed() {
+    addBonehead(bonehead) {
 
-        this.boosterBoneheads.forEach(bonehead => {
-            const capacity = BAG_SIZES[playerData.bag.size].capacity
+        const capacity =
+            BAG_SIZES[playerData.bag.size].capacity
 
-            if (playerData.bag.contents.length < capacity) {
-                const purchasedBonehead = createBoneheadInstance(bonehead.typeId, bonehead.colour)
+        if (playerData.bag.contents.length >= capacity) {
+            return
+        }
 
-                playerData.bag.contents.push({
-                    ...purchasedBonehead,
-                    instanceId: generateInstanceId(),
-                })
-            }
+        const newBonehead =
+            createBoneheadInstance(
+                bonehead.typeId,
+                bonehead.colour
+            )
+
+        playerData.bag.contents.push({
+            ...newBonehead,
+            instanceId: generateInstanceId()
         })
-        
-        this.scene.start('ShopScene')
+
+        const card =
+            this.boneheadCards.find(
+                card => card.bonehead === bonehead
+            )
+
+        if (card) {
+            card.destroy()
+        }
+
+        if (
+            playerData.bag.contents.length >= capacity
+        ) {
+            this.skipButton.setText('Return to shop')
+        }
     }
 
-    createProceedButton() {
-        this.proceedButton = new UIButton(
+    createSkipButton() {
+
+        this.skipButton = new UIButton(
             this,
-            300,
             400,
-            `Add to bag`,
+            450,
+            'Skip',
             UI_STYLES.button,
             () => {
-                this.proceed()
+                this.scene.start('ShopScene')
             },
             {
                 width: 200,
@@ -142,5 +164,4 @@ export default class BoosterScene extends Phaser.Scene {
             }
         )
     }
-
 }
