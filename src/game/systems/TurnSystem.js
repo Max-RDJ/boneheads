@@ -1,6 +1,5 @@
 import Phaser from 'phaser'
-import { advanceEnemy, getCurrentEnemy } from './ProgressSystem'
-import { enemies } from '../data/enemyDB'
+import { getCurrentEnemy } from './ProgressSystem'
 
 
 export default class TurnSystem {

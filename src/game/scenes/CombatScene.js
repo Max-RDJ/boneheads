@@ -48,7 +48,7 @@ export default class CombatScene extends Phaser.Scene {
             600,
             400,
             this.tooltip,
-            'CombatInventoryScene'
+            'InventoryScene',
         )
 
         this.combatSystem = new CombatSystem(this)

@@ -44,7 +44,7 @@ export default class InventoryScene extends Phaser.Scene {
 
         this.add.text(
             400,
-            40,
+            50,
             'Bag',
             UI_STYLES.title
         ).setOrigin(0.5)
@@ -64,15 +64,27 @@ export default class InventoryScene extends Phaser.Scene {
     }
 
     createOverlay() {
-        this.overlay = this.add.rectangle(
-            400,
-            300,
+        this.overlay = this.add.graphics()
+
+        this.overlay.fillStyle(0x000000, 0.75)
+        this.overlay.fillRoundedRect(
+            0,
+            0,
             800,
             600,
-            0x000000,
-            0.65
+            20
         )
 
+        this.overlay.lineStyle(3, 0x666666, 1)
+        this.overlay.strokeRoundedRect(
+            0,
+            0,
+            800,
+            600,
+            20
+        )
+
+        this.overlay.setPosition(0, 0)
         this.overlay.setDepth(0)
     }
 
@@ -80,7 +92,7 @@ export default class InventoryScene extends Phaser.Scene {
         this.backButton = new UIButton(
             this,
             70,
-            50,
+            40,
             'Back',
             UI_STYLES.buttonSmall,
             () => {

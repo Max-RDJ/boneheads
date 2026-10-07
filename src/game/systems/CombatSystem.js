@@ -121,13 +121,19 @@ export default class CombatSystem {
     knockout(sprite) {
         sprite.isDead = true
 
+        const targets = sprite.roundsRemainingCounter
+            ? [sprite, sprite.roundsRemainingCounter]
+            : sprite
+
         this.scene.tweens.add({
-            targets: sprite,
+            targets,
             alpha: 0,
             scale: 0,
-            duration: 300
+            duration: 300,
+            onComplete: () => {
+                this.scene.turnSystem.checkBattleResult()
+            }
         })
-        this.scene.turnSystem.checkBattleResult()
     }
 
     showActionOptions(sprite) {
