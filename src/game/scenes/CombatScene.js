@@ -198,7 +198,7 @@ export default class CombatScene extends Phaser.Scene {
                 hpText: this.add.text(
                     sprite.x,
                     sprite.y,
-                    `${sprite.hp}/${sprite.maxHp}`,
+                    `${sprite.currentHp}/${sprite.maxHp}`,
                     {
                         fontSize: '10px',
                         fontFamily: 'Arial',
@@ -211,7 +211,7 @@ export default class CombatScene extends Phaser.Scene {
                 guardText: this.add.text(
                     sprite.x,
                     sprite.y,
-                    `${sprite.guard}/${sprite.maxGuard}`,
+                    `${sprite.currentGuard}/${sprite.maxGuard}`,
                     {
                         fontSize: '10px',
                         fontFamily: 'Arial',
@@ -307,7 +307,7 @@ export default class CombatScene extends Phaser.Scene {
             const hpRatio =
                 Math.max(
                     0,
-                    Math.min(1, sprite.hp / sprite.maxHp)
+                    Math.min(1, sprite.currentHp / sprite.maxHp)
                 )
 
             if (hpRatio > 0) {
@@ -327,7 +327,7 @@ export default class CombatScene extends Phaser.Scene {
             )
 
             bars.hpText.setText(
-                `${sprite.hp}/${sprite.maxHp}`
+                `${sprite.currentHp}/${sprite.maxHp}`
             )
 
             bars.hpText.setVisible(true)
@@ -336,13 +336,13 @@ export default class CombatScene extends Phaser.Scene {
             // GUARD
             bars.guardBar.clear()
 
-            if (sprite.guard > 0) {
+            if (sprite.currentGuard > 0) {
                 const radius = 4
 
                 const guardRatio =
                     Math.max(
                         0,
-                        Math.min(1, sprite.guard / sprite.maxGuard)
+                        Math.min(1, sprite.currentGuard / sprite.maxGuard)
                     )
 
                 // Shadow

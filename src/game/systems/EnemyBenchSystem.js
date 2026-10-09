@@ -1,7 +1,6 @@
 import Phaser from 'phaser'
 
 import { BONEHEAD_DB } from '../data/boneheadDB'
-import { BONEHEAD_COLOURS } from '../data/boneheadColours'
 import { startSpriteBlinking } from '../helpers/startSpriteBlinking'
 import { getCurrentEnemy } from './ProgressSystem'
 import { generateInstanceId } from '../helpers/generateInstanceId'
@@ -10,12 +9,8 @@ import { COLOURS } from '../ui/ColourMap'
 import { RoundsRemainingCounter } from '../ui/RoundsRemainingCounter'
 
 
-
 const SLOT_SPACING = 100
 const ENEMY_Y = 100
-
-const BATTLE_X = 400
-const BATTLE_Y = 220
 
 export default class EnemyBenchSystem {
 
@@ -127,10 +122,10 @@ export default class EnemyBenchSystem {
         sprite.location = 'bench'
         sprite.isDead = false
         sprite.hasActed = false
-        sprite.maxHp = stats.hp
-        sprite.hp = stats.hp
-        sprite.maxGuard = Math.round(stats.hp / 2)
-        sprite.guard = 0
+        sprite.maxHp = stats.maxHp
+        sprite.currentHp = stats.currentHp
+        sprite.maxGuard = stats.maxGuard
+        sprite.currentGuard = 0
 
         if (unit. roundsRemaining != null) {
             sprite.roundsRemainingCounter =
@@ -164,7 +159,7 @@ export default class EnemyBenchSystem {
             this.tooltip.show(
                 pointer,
                 data.name,
-                `Attack: ${stats.attack}\nHP: ${sprite.hp}/${sprite.maxHp}`,
+                `Attack: ${stats.attack}\nHP: ${sprite.currentHp}/${sprite.maxHp}`,
                 COLOURS[unit.colour]
             )
         })

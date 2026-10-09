@@ -9,7 +9,8 @@ export const PAINT_DB = {
         },
         description: "Double Bonehead's attack; Bonehead is destroyed after 3 rounds.",
         price: 10,
-        sizes: ["10ml", "30ml", "50ml"]
+        sizes: ["10ml", "30ml", "50ml"],
+        weight: 25
     },
     blue: {
         id: "blue",
@@ -21,7 +22,8 @@ export const PAINT_DB = {
         },
         description: "Remove all paint effects from Bonehead.",
         price: 10,
-        sizes: ["10ml", "30ml", "50ml"]
+        sizes: ["10ml", "30ml", "50ml"],
+        weight: 25
     },
     green: {
         id: "green",
@@ -33,7 +35,8 @@ export const PAINT_DB = {
         },
         description: "Bonehead does not incur cost if knocked out.",
         price: 10,
-        sizes: ["10ml", "30ml", "50ml"]
+        sizes: ["10ml", "30ml", "50ml"],
+        weight: 25
     },
     magenta: {
         id: "magenta",
@@ -45,6 +48,7 @@ export const PAINT_DB = {
         },
         description: "When played, creates a random Bonehead and destroys this Bonehead.",
         price: 10,
-        sizes: ["10ml", "30ml", "50ml"]
+        sizes: ["10ml", "30ml", "50ml"],
+        weight: 25
     },
 }

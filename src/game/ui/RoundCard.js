@@ -126,7 +126,7 @@ export class RoundCard extends Phaser.GameObjects.Container {
                 this.tooltip.show(
                     pointer,
                     data.name,
-                    `Attack: ${data.stats.attack}\nHP: ${data.stats.hp}`,
+                    `Attack: ${data.stats.attack}\nHP: ${data.stats.maxHp}`,
                     COLOURS[bonehead.colour]
                 )
             })

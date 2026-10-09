@@ -10,8 +10,8 @@ export const BONEHEAD_DB = {
         },
         stats: {
             attack: 10,
-            hp: 10,
-            guard: 0
+            maxHp: 10,
+            maxGuard: 4
         },
         price: 10
     },
@@ -27,8 +27,8 @@ export const BONEHEAD_DB = {
         },
         stats: {
             attack: 4,
-            hp: 10,
-            guard: 0
+            maxHp: 10,
+            maxGuard: 8
         },
         price: 2
     },
@@ -44,8 +44,8 @@ export const BONEHEAD_DB = {
         },
         stats: {
             attack: 6,
-            hp: 3,
-            guard: 0
+            maxHp: 3,
+            maxGuard: 1
         },
         price: 3
     },
@@ -61,8 +61,8 @@ export const BONEHEAD_DB = {
         },
         stats: {
             attack: 6,
-            hp: 8,
-            guard: 0
+            maxHp: 8,
+            maxGuard: 4
         },
         price: 3
     }

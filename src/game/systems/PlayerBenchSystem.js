@@ -76,15 +76,19 @@ export default class PlayerBenchSystem {
 
         const stats = getBoneheadStats(unit)
 
+        console.log('Bonehead instance:', unit)
+console.log('Calculated stats:', stats)
+
         sprite.unit = unit
         sprite.slotIndex = index
         sprite.location = 'bench'
+        sprite.isDamaged = false
         sprite.isDead = false
         sprite.hasActed = false
-        sprite.maxHp = stats.hp
-        sprite.hp = stats.hp
-        sprite.maxGuard = Math.round(stats.hp / 2)
-        sprite.guard = 0
+        sprite.maxHp = stats.maxHp
+        sprite.currentHp = unit.currentHp ?? stats.currentHp
+        sprite.maxGuard = stats.maxGuard
+        sprite.currentGuard = unit.currentGuard ?? 0
 
         if (unit.roundsRemaining != null) {
             sprite.roundsRemainingCounter =
@@ -114,7 +118,7 @@ export default class PlayerBenchSystem {
             this.tooltip.show(
                 pointer,
                 data.name,
-                `Attack: ${stats.attack}\nHP: ${sprite.hp}/${sprite.maxHp}`,
+                `Attack: ${stats.attack}\nHP: ${sprite.currentHp}/${sprite.maxHp}`,
                 COLOURS[unit.colour]
             )
 

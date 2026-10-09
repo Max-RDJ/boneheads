@@ -10,14 +10,14 @@ export const SHOP_LAYOUT = {
             height: 160
         },
 
-        boosters: {
+        misc: {
             x: 30,
             y: 330,
             width: 450,
             height: 250
         },
 
-        paint: {
+        repairs: {
             x: 510,
             y: 330,
             width: 260,

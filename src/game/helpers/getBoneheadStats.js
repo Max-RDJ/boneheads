@@ -6,17 +6,14 @@ export function getBoneheadStats(bonehead) {
 
     const stats = {
         attack: baseStats.attack,
-        hp: baseStats.hp,
-        guard: baseStats.guard
+        maxHp: baseStats.maxHp,
+        currentHp: bonehead.currentHp ?? baseStats.maxHp,
+        maxGuard: baseStats.maxGuard ?? baseStats.guard ?? Math.round(baseStats.maxHp / 2)
     }
 
     const paintEffect = PAINT_EFFECTS[bonehead.colour]
 
-    if (!paintEffect) {
-        return stats
-    }
-
-    if (paintEffect.attackMultiplier) {
+    if (paintEffect?.attackMultiplier) {
         stats.attack *= paintEffect.attackMultiplier
     }
 

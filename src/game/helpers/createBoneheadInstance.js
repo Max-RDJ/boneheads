@@ -39,9 +39,9 @@ export function createBoneheadInstance(id, colour) {
         typeId: id,
         colour: selectedColour,
         attack: bonehead.stats.attack,
-        maxHp: bonehead.stats.hp,
-        currentHp: bonehead.stats.hp,
-        maxGuard: Math.round(bonehead.stats.hp / 2),
+        maxHp: bonehead.stats.maxHp,
+        currentHp: bonehead.stats.maxHp,
+        maxGuard: bonehead.stats.guard,
         currentGuard: 0,
 
         roundsRemaining:

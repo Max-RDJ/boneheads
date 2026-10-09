@@ -1,4 +1,5 @@
 import { getBoneheadStats } from '../helpers/getBoneheadStats'
+import { playerData } from '../state/playerData'
 
 
 export default class CombatSystem {
@@ -6,6 +7,20 @@ export default class CombatSystem {
     constructor(scene) {
         this.scene = scene
         this.selectedUnit = null
+    }
+
+    syncBoneheadStats(sprite) {
+        const bagBonehead = playerData.bag.contents.find(
+            bonehead => bonehead.instanceId === sprite.unit.instanceId
+        )
+
+        if (!bagBonehead) {
+            return
+        }
+
+        bagBonehead.currentHp = Math.max(0, sprite.currentHp)
+        bagBonehead.currentGuard = sprite.currentGuard
+        bagBonehead.isDead = sprite.currentHp <= 0
     }
 
     selectUnit(sprite) {
@@ -51,37 +66,30 @@ export default class CombatSystem {
 
         const damage = attackerStats.attack
 
-        console.log(
-            `${attacker.unit.typeId} attacks ${defender.unit.typeId}`
-        )
-
         let remainingDamage = damage
 
-        if (defender.guard > 0) {
+        if (defender.currentGuard > 0) {
             const absorbed = Math.min(
-                defender.guard,
+                defender.currentGuard,
                 remainingDamage
             )
 
-            defender.guard -= absorbed
+            defender.currentGuard -= absorbed
             remainingDamage -= absorbed
         }
 
         if (remainingDamage > 0) {
-            defender.hp -= remainingDamage
+            defender.currentHp = Math.max(
+                0,
+                defender.currentHp - remainingDamage
+            )
+
+            this.syncBoneheadStats(defender)
         }
-
-        console.log(
-            `${defender.unit.typeId} Guard: ${defender.guard}`
-        )
-
-        console.log(
-            `${defender.unit.typeId} HP: ${defender.hp}`
-        )
 
         attacker.hasActed = true
 
-        if (defender.hp <= 0) {
+        if (defender.currentHp <= 0) {
             this.knockout(defender)
         }
 
@@ -96,7 +104,7 @@ export default class CombatSystem {
             return false
         }
 
-        sprite.guard = sprite.maxGuard
+        sprite.currentGuard = sprite.maxGuard
         sprite.isGuarding = true
         sprite.hasActed = true
 
@@ -105,11 +113,11 @@ export default class CombatSystem {
         )
 
         console.log(
-            `${sprite.unit.typeId} Guard: ${sprite.guard}`
+            `${sprite.unit.typeId} Guard: ${sprite.maxGuard}`
         )
 
         console.log(
-            `${sprite.unit.typeId} HP: ${sprite.hp}`
+            `${sprite.unit.typeId} HP: ${sprite.currentHp}`
         )
 
         this.selectedUnit = null

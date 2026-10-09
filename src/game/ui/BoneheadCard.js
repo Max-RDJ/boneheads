@@ -71,7 +71,7 @@ export class BoneheadCard extends Phaser.GameObjects.Container {
             this.tooltip.show(
                 pointer,
                 data.name,
-                `Attack: ${stats.attack}\nHP: ${stats.hp}`,
+                `Attack: ${stats.attack}\nHP: ${stats.currentHp}`,
                 COLOURS[this.bonehead.colour]
             )
 

@@ -20,6 +20,7 @@ import { startSpriteBlinking } from '../helpers/startSpriteBlinking'
 import { centerText } from '../ui/utils/centerText'
 import { createBoneheadInstance } from '../helpers/createBoneheadInstance'
 import { generateInstanceId } from '../helpers/generateInstanceId'
+import { repairBonehead } from '../helpers/repairBonehead'
 
 import { Tooltip } from '../ui/Tooltip'
 import { UIButton } from '../ui/uiButton'
@@ -36,7 +37,11 @@ export default class ShopScene extends Phaser.Scene {
         this.tooltip = new Tooltip(this)
         this.paintTooltip = new Tooltip(this)
 
-        if (!playerData.shop.boneheads || data.refreshShop) {
+        if (
+            !playerData.shop.boneheads ||
+            !playerData.shop.misc ||
+            data.refreshShop
+        ) {
             this.refreshShop()
         }
 
@@ -63,8 +68,8 @@ export default class ShopScene extends Phaser.Scene {
         )
 
         this.createBoneheadMarket()
-        this.createBoosterMarket()
-        this.createPaintMarket()
+        this.createMiscMarket()
+        this.createRepairShop()
         this.createStartBattleButton()
         this.createRerollButton()
     }
@@ -72,8 +77,7 @@ export default class ShopScene extends Phaser.Scene {
     generateShopStock() {
         return {
             boneheads: this.generateBoneheadStock(),
-            boosters: this.generateBoosterStock(),
-            paints: this.generatePaintStock()
+            misc: this.generateMiscStock(),
         }
     }
 
@@ -208,29 +212,41 @@ export default class ShopScene extends Phaser.Scene {
         this.refreshCoins()
     }
 
-    createBoosterMarket() {
-        const panelLayout = SHOP_LAYOUT.panels.boosters
+    createMiscMarket() {
+        const panelLayout = SHOP_LAYOUT.panels.misc
 
-        this.boosterPanel = new Panel(
+        this.miscPanel = new Panel(
             this,
             panelLayout.x,
             panelLayout.y,
             panelLayout.width,
             panelLayout.height,
             {
-                title: 'Booster Packs',
+                title: 'Miscellaneous',
                 errorOverlay: true
             }
         )
 
-        this.createBoosterCards(this.boosterPanel)
+        this.createMiscCards(this.miscPanel)
     }
 
-    generateBoosterStock() {
-        const boosters = Object.entries(BOOSTER_DB)
+    generateMiscStock() {
+        const miscStock = [
+            ...Object.entries(BOOSTER_DB).map(([id, data]) => ({
+                id,
+                ...data,
+                type: 'booster'
+            })),
 
-        const totalWeight = boosters.reduce(
-            (total, [, data]) => total + data.weight,
+            ...Object.entries(PAINT_DB).map(([id, data]) => ({
+                id,
+                ...data,
+                type: 'paint'
+            }))
+        ]
+
+        const totalWeight = miscStock.reduce(
+            (total, item) => total + item.weight,
             0
         )
 
@@ -239,13 +255,12 @@ export default class ShopScene extends Phaser.Scene {
         for (let i = 0; i < 3; i++) {
             let random = Math.random() * totalWeight
 
-            for (const [id, data] of boosters) {
-
-                random -= data.weight
+            for (const item of miscStock) {
+                random -= item.weight
 
                 if (random <= 0) {
                     stock.push({
-                        ...data,
+                        ...item,
                         instanceId: generateInstanceId(),
                         sold: false
                     })
@@ -258,64 +273,83 @@ export default class ShopScene extends Phaser.Scene {
         return stock
     }
 
-    createBoosterCards(panel) {
-        const boosterLayout = SHOP_LAYOUT.boosters
+    createMiscCards(panel) {
+        const miscLayout = SHOP_LAYOUT.boosters
 
-        this.boosterCards = []
+        this.miscCards = []
 
-        playerData.shop.boosters.forEach((booster, index) => {
+        playerData.shop.misc.forEach((item, index) => {
 
             const x =
-                boosterLayout.offsetX +
-                index * boosterLayout.spacing
+                miscLayout.offsetX +
+                index * miscLayout.spacing
 
             const y =
-                boosterLayout.offsetY
+                miscLayout.offsetY
 
-            if (booster.sold) {
+            if (item.sold) {
                 this.createSoldText(panel, x, y)
                 return
             }
 
-            const card = new BoosterCard(
-                this,
-                x,
-                y,
-                booster,
-                this.buyBooster.bind(this),
-                this.tooltip
-            )
+            let card
 
-            card.boosterId = booster.instanceId
+            if (item.type === 'booster') {
+                card = new BoosterCard(
+                    this,
+                    x,
+                    y,
+                    item,
+                    this.buyBooster.bind(this),
+                    this.tooltip
+                )
 
-            this.boosterCards.push(card)
+                card.boosterId = item.instanceId
 
+            } else if (item.type === 'paint') {
+                card = new PaintCard(
+                    this,
+                    x,
+                    y,
+                    item,
+                    this.buyPaint.bind(this),
+                    this.paintTooltip
+                )
+
+                card.paintId = item.instanceId
+            }
+
+            if (!card) {
+                return
+            }
+
+            this.miscCards.push(card)
             panel.addContent(card)
         })
     }
 
     buyBooster(booster) {
         if (playerData.coins < booster.price) {
-            this.boosterPanel.errorOverlay.showMessage('You broke, pal?')
+            this.miscPanel.errorOverlay.showMessage('You broke, pal?')
             return
         }
 
         if (checkBagFull()) {
-            this.boosterPanel.errorOverlay.showMessage('Bag full!')
+            this.miscPanel.errorOverlay.showMessage('Bag full!')
             return
         }
 
         playerData.coins -= booster.price
 
-        const shopBooster = playerData.shop.boosters.find(
+        const shopItem = playerData.shop.misc.find(
             item => item.instanceId === booster.instanceId
         )
 
-        if (shopBooster) {
-            shopBooster.sold = true
+        if (shopItem) {
+            shopItem.sold = true
         }
 
-        const card = this.boosterCards.find(
+        const card = this.miscCards.find(
             card => card.boosterId === booster.instanceId
         )
 
@@ -327,7 +361,7 @@ export default class ShopScene extends Phaser.Scene {
 
             card.destroy()
 
-            this.createSoldText(this.boosterPanel, x, y)
+            this.createSoldText(this.miscPanel, x, y)
         }
 
         this.refreshCoins()
@@ -355,61 +389,139 @@ export default class ShopScene extends Phaser.Scene {
         this.createPaintCards(this.paintPanel)
     }
 
-    createPaintCards(panel) {
-        const paintLayout = SHOP_LAYOUT.paint
+    createRepairShop() {
+        const panelLayout = SHOP_LAYOUT.panels.repairs
 
-        this.paintCards = []
-
-        playerData.shop.paints.forEach((paint, index) => {
-
-            const column = index % 2
-            const row = Math.floor(index / 2)
-
-            const x =
-                paintLayout.offsetX +
-                column * paintLayout.spacing
-
-            const y =
-                paintLayout.offsetY +
-                row * paintLayout.spacing
-
-            if (paint.sold) {
-                this.createSoldText(panel, x, y)
-                return
+        this.repairsPanel = new Panel(
+            this,
+            panelLayout.x,
+            panelLayout.y,
+            panelLayout.width,
+            panelLayout.height,
+            {
+                title: 'Repairs'
             }
+        )
 
-            const card = new PaintCard(
-                this,
-                x,
-                y,
-                paint,
-                this.buyPaint.bind(this),
-                this.tooltip
+        const knockedOutBoneheads =
+            playerData.bag.contents.filter(
+                bonehead => bonehead.isDead ||
+                bonehead.currentHp < bonehead.maxHp
             )
 
-            card.paintId = paint.instanceId
+        const previewBoneheads =
+            knockedOutBoneheads.slice(0, 4)
 
-            this.paintCards.push(card)
+        const hasMore =
+            knockedOutBoneheads.length > 4
 
-            panel.addContent(card)
-        })
+        const positions = [
+            {
+                x: panelLayout.x + 65,
+                y: panelLayout.y + 90
+            },
+            {
+                x: panelLayout.x + 190,
+                y: panelLayout.y + 90
+            },
+            {
+                x: panelLayout.x + 65,
+                y: panelLayout.y + 185
+            },
+            {
+                x: panelLayout.x + 190,
+                y: panelLayout.y + 185
+            }
+        ]
+
+        const cardsToShow = hasMore
+            ? previewBoneheads.slice(0, 3)
+            : previewBoneheads
+
+        if (cardsToShow.length > 0) {
+            cardsToShow.forEach((bonehead, index) => {
+                const position = positions[index]
+
+                this.createRepairCard(
+                    bonehead,
+                    position.x,
+                    position.y
+                )
+            })
+        } else {
+            const noRepairsText = this.add.text(
+                panelLayout.x + panelLayout.width / 2,
+                panelLayout.y + panelLayout.height / 2,
+                'No Boneheads need fixing',
+                {
+                    fontSize: '16px',
+                    fill: '#fdfdfd'
+                }
+            )
+            noRepairsText.setOrigin(0.5)
+        }
+
+        if (hasMore) {
+            const position = positions[3]
+
+            this.createMoreRepairsButton(
+                position.x,
+                position.y
+            )
+        }
     }
 
-    generatePaintStock() {
-        const paintIds = Phaser.Utils.Array.Shuffle(
-            Object.keys(PAINT_DB)
-        ).slice(0, 4)
+    createRepairCard(bonehead, x, y) {
+        const card = new BoneheadCard(
+            this,
+            x,
+            y,
+            bonehead,
+            (selectedBonehead) => repairBonehead( selectedBonehead, this ),
+            this.tooltip,
+            this.paintTooltip,
+            {
+                showPrice: true
+            }
+        )
 
-        return paintIds.map(id => ({
-            ...PAINT_DB[id],
-            instanceId: generateInstanceId(),
-            sold: false
-        }))
+        card.boneheadId = bonehead.instanceId
+
+        this.repairsPanel.addContent(card)
+
+        return card
+    }
+
+    createMoreRepairsButton(x, y) {
+        const button = new UIButton(
+            this,
+            x,
+            y,
+            'More',
+            UI_STYLES.buttonSmall,
+            () => {
+                this.showRepairOverlay()
+            },
+            {
+                width: 100,
+                height: 75
+            }
+        )
+
+        this.repairsPanel.addContent(button)
+
+        return button
+    }
+
+    showRepairOverlay() {
+        this.scene.launch('RepairsScene', {
+            returnScene: this.scene.key
+        })
     }
 
     buyPaint(paint) {
         if (playerData.coins < paint.price) {
-            this.paintPanel.errorOverlay.showMessage('You broke, pal?')
+            this.miscPanel.errorOverlay.showMessage('You broke, pal?')
             return
         }
 
@@ -421,31 +533,31 @@ export default class ShopScene extends Phaser.Scene {
             colour: paint.colour
         })
 
-        const shopPaint = playerData.shop.paints.find(
+        const shopItem = playerData.shop.misc.find(
             item => item.instanceId === paint.instanceId
         )
 
-        if (shopPaint) {
-            shopPaint.sold = true
+        if (shopItem) {
+            shopItem.sold = true
         }
 
-        const card = this.paintCards.find(
+        const card = this.miscCards.find(
             card => card.paintId === paint.instanceId
         )
 
         if (card) {
-            this.tooltip.hide()
+            this.paintTooltip.hide()
 
             const x = card.x
             const y = card.y
 
             card.destroy()
 
-            this.createSoldText(this.paintPanel, x, y)
+            this.createSoldText(this.miscPanel, x, y)
         }
 
         this.refreshCoins()
-    } 
+    }
 
     refreshCoins() {
         this.coinCounter.setAmount(playerData.coins)
@@ -456,6 +568,19 @@ export default class ShopScene extends Phaser.Scene {
             x,
             y - 20,
             'SOLD!',
+            UI_STYLES.bodySmall
+        ).setOrigin(0.5)
+
+        panel.addContent(soldText)
+
+        return soldText
+    }
+
+    createRepairedText(panel, x, y) {
+        const soldText = this.add.text(
+            x,
+            y - 20,
+            'REPAIRED!',
             UI_STYLES.bodySmall
         ).setOrigin(0.5)
 
