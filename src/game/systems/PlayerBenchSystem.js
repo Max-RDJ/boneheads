@@ -76,9 +76,6 @@ export default class PlayerBenchSystem {
 
         const stats = getBoneheadStats(unit)
 
-        console.log('Bonehead instance:', unit)
-console.log('Calculated stats:', stats)
-
         sprite.unit = unit
         sprite.slotIndex = index
         sprite.location = 'bench'

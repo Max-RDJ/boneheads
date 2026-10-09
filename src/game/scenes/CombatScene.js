@@ -393,7 +393,7 @@ export default class CombatScene extends Phaser.Scene {
                 )
 
                 bars.guardText.setText(
-                    `${sprite.guard}/${sprite.maxGuard}`
+                    `${sprite.currentGuard}/${sprite.maxGuard}`
                 )
 
                 bars.guardText.setVisible(true)
